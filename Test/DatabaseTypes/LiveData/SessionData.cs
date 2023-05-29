@@ -1,3 +1,14 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Net;
+using System.IO;
+
+using System.Numerics;
+namespace PDTools.SimulatorInterface
+{
        public class SessionData{
         /// <summary>
         /// Internal code that identifies the car.
@@ -40,3 +51,4 @@
         public SimulatorInterfaceGameType GameType { get; set; }
          public IPEndPoint RemoteEndPoint { get; private set; }
        }
+}

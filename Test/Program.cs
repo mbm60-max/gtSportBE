@@ -1,16 +1,23 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using PDTools.SimulatorInterface;
+using Microsoft.AspNetCore.SignalR;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
 using System.Net;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Diagnostics;
+using Microsoft.Extensions.Hosting;
 
 
-using PDTools.SimulatorInterface;
 
 namespace PDTools.SimulatorInterfaceTestTool
 {
@@ -20,13 +27,15 @@ namespace PDTools.SimulatorInterfaceTestTool
         private static IMongoDatabase _database;
         private static string _collectionName;
 
+        private static IHost host;
+        private static IHubContext<ThrottleHub> hubContext;
         static async Task Main(string[] args)
         {
             /* Mostly a test sample for using the Simulator Interface library */
-            var connectionString = "mongodb+srv://maxbm:Kismetuni66@pdtoolcluster.een0p7c.mongodb.net/?retryWrites=true&w=majority";
-            var client = new MongoClient(connectionString);
-            _database = client.GetDatabase("Test");
-            _collectionName = "Test Collection";
+            //var connectionString = "mongodb+srv://maxbm:Kismetuni66@pdtoolcluster.een0p7c.mongodb.net/?retryWrites=true&w=majority";
+            //var client = new MongoClient(connectionString);
+            //_database = client.GetDatabase("Test");
+            //_collectionName = "Test Collection";
             //_database.CreateCollection(_collectionName);
             
            
@@ -67,6 +76,17 @@ namespace PDTools.SimulatorInterfaceTestTool
 
             // Cancel token from outside source to end simulator
             var task = simInterface.Start(cts.Token);
+            
+            // Build the host
+            var host = CreateHostBuilder(args).Build();
+
+            // Start the host in the background
+            _ = host.RunAsync();
+
+            // Get the hub context
+            var serviceProvider = host.Services;
+            hubContext = serviceProvider.GetRequiredService<IHubContext<ThrottleHub>>();
+
 
             try
             {
@@ -84,6 +104,11 @@ namespace PDTools.SimulatorInterfaceTestTool
             {
                 // Important to clear up underlying socket
                 simInterface.Dispose();
+
+                // Stop the host
+                await host.StopAsync();
+                host.Dispose();
+
             }
         }
 
@@ -96,30 +121,31 @@ namespace PDTools.SimulatorInterfaceTestTool
             //packet.PrintPacket(_showUnknown);
             packet.PrintBasic(_showUnknown);
             byte x = packet.giveThrottle();
-            if (x > 0)
-            {
+            if (x > 0){
                 throttleValue = x;
-             Console.WriteLine();  
-         Console.WriteLine("Current Throttle value: " +  throttleValue.ToString().PadLeft(3));
-         if (stopwatch == null)
-                {
+                Console.WriteLine();  
+                Console.WriteLine("Current Throttle value: " +  throttleValue.ToString().PadLeft(3));
+                if (stopwatch == null){
                     StartTimer( ref stopwatch);
                 }
- else if (x > 100 && stopwatch != null)
-            {
-                EndTimer(ref stopwatch);
-            }
+                else if (x > 100 && stopwatch != null){
+                    EndTimer(ref stopwatch);
+                }
+                 hubContext.Clients.All.SendAsync("ReceiveThrottleValue", throttleValue);
             }
 
             // Get the game type the packet was issued from
             SimulatorInterfaceGameType gameType = packet.GameType;
              //InsertDocument(packet);
             // Check on flags for whether the simulation is active
-            if (packet.Flags.HasFlag(SimulatorFlags.CarOnTrack) && !packet.Flags.HasFlag(SimulatorFlags.Paused) && !packet.Flags.HasFlag(SimulatorFlags.LoadingOrProcessing))
-            {
+            if (packet.Flags.HasFlag(SimulatorFlags.CarOnTrack) && !packet.Flags.HasFlag(SimulatorFlags.Paused) && !packet.Flags.HasFlag(SimulatorFlags.LoadingOrProcessing)){
                 // Do stuff with packet
                 //InsertDocument(packet);
             }
+             // Send throttle value to connected clients
+             //if(throttleValue!= null){
+               // hubContext.Clients.All.SendAsync("ReceiveThrottleValue", throttleValue);
+             //}
         }
 
         public static void InsertDocument(SimulatorPacket packet)
@@ -128,28 +154,52 @@ namespace PDTools.SimulatorInterfaceTestTool
             collection.InsertOne(packet);
         }
 
-public static void StartTimer( ref Stopwatch stopwatch)
+        public static void StartTimer( ref Stopwatch stopwatch)
         {
             //update the timer refrence to be a new timer object miliseconds
             stopwatch = new Stopwatch();
             stopwatch.Start();
         }
 
-   public static void EndTimer(ref Stopwatch stopwatch)
-{
-    if (stopwatch != null)
+        public static void EndTimer(ref Stopwatch stopwatch){
+            if (stopwatch != null)
+            {
+                stopwatch.Stop();
+                TimeSpan ts = stopwatch.Elapsed;
+                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                    ts.Hours, ts.Minutes, ts.Seconds,
+                    ts.Milliseconds / 10);
+                Console.WriteLine("RunTime " + elapsedTime);
+            }
+        }
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+    Host.CreateDefaultBuilder(args)
+        .ConfigureWebHostDefaults(webBuilder =>
+        {
+            webBuilder.ConfigureServices(services =>
+            {
+                services.AddSignalR(); // Add this line to add the SignalR services
+            });
+
+            webBuilder.Configure(app =>
+            {
+                app.UseRouting();
+                app.UseEndpoints(endpoints =>
+                {
+                    endpoints.MapHub<ThrottleHub>("/throttlehub");
+                });
+            });
+        });
+
+    }
+    
+
+    public class ThrottleHub : Hub
     {
-        stopwatch.Stop();
-        TimeSpan ts = stopwatch.Elapsed;
-        string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-            ts.Hours, ts.Minutes, ts.Seconds,
-            ts.Milliseconds / 10);
-        Console.WriteLine("RunTime " + elapsedTime);
+        public async Task SendThrottleValue(byte throttleValue)
+        {
+            await Clients.All.SendAsync("ReceiveThrottleValue", throttleValue);
+        }
     }
-}
 
-        
-
-
-    }
 }
