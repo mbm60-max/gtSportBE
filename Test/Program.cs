@@ -16,6 +16,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Diagnostics;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 
 
@@ -85,11 +86,18 @@ namespace PDTools.SimulatorInterfaceTestTool
 
             // Get the hub context
             var serviceProvider = host.Services;
+            //Console.WriteLine(throttleValue);
             hubContext = serviceProvider.GetRequiredService<IHubContext<ThrottleHub>>();
-
+            await hubContext.Clients.All.SendAsync("SendMessage", "max");
+           // await hubContext.Clients.All.SendAsync("ReceiveThrottleValue", throttleValue);
+           // Console.WriteLine(hubContext.Clients.All);
+           
 
             try
             {
+                //hubContext.Clients.All.SendAsync("ReceiveThrottleValue", throttleValue);
+               // Console.WriteLine(hubContext);
+
                 await task;
             }
             catch (OperationCanceledException e)
@@ -178,12 +186,33 @@ namespace PDTools.SimulatorInterfaceTestTool
         {
             webBuilder.ConfigureServices(services =>
             {
-                services.AddSignalR(); // Add this line to add the SignalR services
+                services.AddCors(options =>
+                {
+                    options.AddDefaultPolicy(builder =>
+                    {
+                        builder.WithOrigins("http://localhost:3000")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowCredentials();
+                    });
+                });
+
+                services.AddSignalR();
+            });
+            
+            webBuilder.ConfigureLogging(logging =>
+            {
+                logging.SetMinimumLevel(LogLevel.Information);
+                logging.AddConsole();
             });
 
             webBuilder.Configure(app =>
             {
                 app.UseRouting();
+                app.UseDeveloperExceptionPage();
+
+                app.UseCors(); // Add this line to enable CORS
+
                 app.UseEndpoints(endpoints =>
                 {
                     endpoints.MapHub<ThrottleHub>("/throttlehub");
@@ -196,9 +225,21 @@ namespace PDTools.SimulatorInterfaceTestTool
 
     public class ThrottleHub : Hub
     {
-        public async Task SendThrottleValue(byte throttleValue)
+        //public async Task ReceiveThrottleValue(byte throttleValue)
+        //{
+          //  Console.WriteLine($"Received throttle value: {throttleValue}");
+            //await Clients.All.SendAsync("ReceiveThrottleValue", throttleValue);
+        //}
+        public async Task SendMessage(string name)
         {
-            await Clients.All.SendAsync("ReceiveThrottleValue", throttleValue);
+            try{
+                Console.WriteLine($"Received throttle value: {name}");
+                //await Clients.All.SendAsync("SendMessage", name);
+            }catch (Exception ex)
+    {
+        // Handle the exception and log the error
+        Console.WriteLine($"Error in ReceiveThrottleValue: {ex.Message}");
+    }
         }
     }
 

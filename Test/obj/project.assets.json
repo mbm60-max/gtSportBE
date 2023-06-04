@@ -99,19 +99,19 @@
           }
         }
       },
-      "Microsoft.AspNetCore.Connections.Abstractions/2.2.0": {
+      "Microsoft.AspNetCore.Connections.Abstractions/8.0.0-preview.4.23260.4": {
         "type": "package",
         "dependencies": {
-          "Microsoft.AspNetCore.Http.Features": "2.2.0",
-          "System.IO.Pipelines": "4.5.2"
+          "Microsoft.Extensions.Features": "8.0.0-preview.4.23260.4",
+          "System.IO.Pipelines": "8.0.0-preview.4.23259.5"
         },
         "compile": {
-          "lib/netstandard2.0/Microsoft.AspNetCore.Connections.Abstractions.dll": {
+          "lib/netstandard2.1/Microsoft.AspNetCore.Connections.Abstractions.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/netstandard2.0/Microsoft.AspNetCore.Connections.Abstractions.dll": {
+          "lib/netstandard2.1/Microsoft.AspNetCore.Connections.Abstractions.dll": {
             "related": ".xml"
           }
         }
@@ -317,21 +317,20 @@
           }
         }
       },
-      "Microsoft.AspNetCore.SignalR.Common/1.1.0": {
+      "Microsoft.AspNetCore.SignalR.Common/8.0.0-preview.4.23260.4": {
         "type": "package",
         "dependencies": {
-          "Microsoft.AspNetCore.Connections.Abstractions": "2.2.0",
-          "Microsoft.Extensions.Options": "2.2.0",
-          "Newtonsoft.Json": "11.0.2",
-          "System.Buffers": "4.5.0"
+          "Microsoft.AspNetCore.Connections.Abstractions": "8.0.0-preview.4.23260.4",
+          "Microsoft.Extensions.Options": "8.0.0-preview.4.23259.5",
+          "System.Text.Json": "8.0.0-preview.4.23259.5"
         },
         "compile": {
-          "lib/netcoreapp2.2/Microsoft.AspNetCore.SignalR.Common.dll": {
+          "lib/netstandard2.0/Microsoft.AspNetCore.SignalR.Common.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/netcoreapp2.2/Microsoft.AspNetCore.SignalR.Common.dll": {
+          "lib/netstandard2.0/Microsoft.AspNetCore.SignalR.Common.dll": {
             "related": ".xml"
           }
         }
@@ -611,6 +610,19 @@
         },
         "build": {
           "buildTransitive/net6.0/_._": {}
+        }
+      },
+      "Microsoft.Extensions.Features/8.0.0-preview.4.23260.4": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/Microsoft.Extensions.Features.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.Extensions.Features.dll": {
+            "related": ".xml"
+          }
         }
       },
       "Microsoft.Extensions.FileProviders.Abstractions/8.0.0-preview.4.23259.5": {
@@ -1240,15 +1252,20 @@
           }
         }
       },
-      "System.IO.Pipelines/4.5.2": {
+      "System.IO.Pipelines/8.0.0-preview.4.23259.5": {
         "type": "package",
         "compile": {
-          "ref/netstandard1.3/System.IO.Pipelines.dll": {}
-        },
-        "runtime": {
-          "lib/netcoreapp2.1/System.IO.Pipelines.dll": {
+          "lib/net7.0/System.IO.Pipelines.dll": {
             "related": ".xml"
           }
+        },
+        "runtime": {
+          "lib/net7.0/System.IO.Pipelines.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net6.0/_._": {}
         }
       },
       "System.Memory/4.5.5": {
@@ -1637,16 +1654,24 @@
         "microsoft.aspnetcore.authorization.policy.nuspec"
       ]
     },
-    "Microsoft.AspNetCore.Connections.Abstractions/2.2.0": {
-      "sha512": "Aqr/16Cu5XmGv7mLKJvXRxhhd05UJ7cTTSaUV4MZ3ynAzfgWjsAdpIU8FWuxwAjmVdmI8oOWuVDrbs+sRkhKnA==",
+    "Microsoft.AspNetCore.Connections.Abstractions/8.0.0-preview.4.23260.4": {
+      "sha512": "hsidDQ7Nrp+CzK+mWsVePmy8q1i7p/JUTVO2emcyIfdMhQ6ukLn4tZgvxioKriO7zpYo6kk8FAn+GO9X/TlF3g==",
       "type": "package",
-      "path": "microsoft.aspnetcore.connections.abstractions/2.2.0",
+      "path": "microsoft.aspnetcore.connections.abstractions/8.0.0-preview.4.23260.4",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
+        "Icon.png",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net462/Microsoft.AspNetCore.Connections.Abstractions.dll",
+        "lib/net462/Microsoft.AspNetCore.Connections.Abstractions.xml",
+        "lib/net8.0/Microsoft.AspNetCore.Connections.Abstractions.dll",
+        "lib/net8.0/Microsoft.AspNetCore.Connections.Abstractions.xml",
         "lib/netstandard2.0/Microsoft.AspNetCore.Connections.Abstractions.dll",
         "lib/netstandard2.0/Microsoft.AspNetCore.Connections.Abstractions.xml",
-        "microsoft.aspnetcore.connections.abstractions.2.2.0.nupkg.sha512",
+        "lib/netstandard2.1/Microsoft.AspNetCore.Connections.Abstractions.dll",
+        "lib/netstandard2.1/Microsoft.AspNetCore.Connections.Abstractions.xml",
+        "microsoft.aspnetcore.connections.abstractions.8.0.0-preview.4.23260.4.nupkg.sha512",
         "microsoft.aspnetcore.connections.abstractions.nuspec"
       ]
     },
@@ -1797,18 +1822,22 @@
         "microsoft.aspnetcore.signalr.nuspec"
       ]
     },
-    "Microsoft.AspNetCore.SignalR.Common/1.1.0": {
-      "sha512": "TyLgQ4y4RVUIxiYFnHT181/rJ33/tL/NcBWC9BwLpulDt5/yGCG4EvsToZ49EBQ7256zj+R6OGw6JF+jj6MdPQ==",
+    "Microsoft.AspNetCore.SignalR.Common/8.0.0-preview.4.23260.4": {
+      "sha512": "P1zoBkOj88A/9azKgYlLRaofyl9y6p1F9hjPVtD9c4UhYZRxW1ivFhDkGlWbExhHkrXits/mQFzj1Hf8YTgR0g==",
       "type": "package",
-      "path": "microsoft.aspnetcore.signalr.common/1.1.0",
+      "path": "microsoft.aspnetcore.signalr.common/8.0.0-preview.4.23260.4",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "lib/netcoreapp2.2/Microsoft.AspNetCore.SignalR.Common.dll",
-        "lib/netcoreapp2.2/Microsoft.AspNetCore.SignalR.Common.xml",
+        "Icon.png",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net462/Microsoft.AspNetCore.SignalR.Common.dll",
+        "lib/net462/Microsoft.AspNetCore.SignalR.Common.xml",
+        "lib/net8.0/Microsoft.AspNetCore.SignalR.Common.dll",
+        "lib/net8.0/Microsoft.AspNetCore.SignalR.Common.xml",
         "lib/netstandard2.0/Microsoft.AspNetCore.SignalR.Common.dll",
         "lib/netstandard2.0/Microsoft.AspNetCore.SignalR.Common.xml",
-        "microsoft.aspnetcore.signalr.common.1.1.0.nupkg.sha512",
+        "microsoft.aspnetcore.signalr.common.8.0.0-preview.4.23260.4.nupkg.sha512",
         "microsoft.aspnetcore.signalr.common.nuspec"
       ]
     },
@@ -2181,6 +2210,25 @@
         "microsoft.extensions.dependencyinjection.abstractions.8.0.0-preview.4.23259.5.nupkg.sha512",
         "microsoft.extensions.dependencyinjection.abstractions.nuspec",
         "useSharedDesignerContext.txt"
+      ]
+    },
+    "Microsoft.Extensions.Features/8.0.0-preview.4.23260.4": {
+      "sha512": "/+gOTGqcsC+b9KMdr4rNHkiISGriF+noRrybkWm0Ng+Bj8PuF6UxlbcT16RsIG0HSh0/zNNu+RDtMhALeOvwFw==",
+      "type": "package",
+      "path": "microsoft.extensions.features/8.0.0-preview.4.23260.4",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net462/Microsoft.Extensions.Features.dll",
+        "lib/net462/Microsoft.Extensions.Features.xml",
+        "lib/net8.0/Microsoft.Extensions.Features.dll",
+        "lib/net8.0/Microsoft.Extensions.Features.xml",
+        "lib/netstandard2.0/Microsoft.Extensions.Features.dll",
+        "lib/netstandard2.0/Microsoft.Extensions.Features.xml",
+        "microsoft.extensions.features.8.0.0-preview.4.23260.4.nupkg.sha512",
+        "microsoft.extensions.features.nuspec"
       ]
     },
     "Microsoft.Extensions.FileProviders.Abstractions/8.0.0-preview.4.23259.5": {
@@ -3122,26 +3170,33 @@
         "system.io.nuspec"
       ]
     },
-    "System.IO.Pipelines/4.5.2": {
-      "sha512": "NOC/SO4gSX6t0tB25xxDPqPEzkksuzW7NVFBTQGAkjXXUPQl7ZtyE83T7tUCP2huFBbPombfCKvq1Ox1aG8D9w==",
+    "System.IO.Pipelines/8.0.0-preview.4.23259.5": {
+      "sha512": "Nxx9PB+xn4pbzoj0vQJJ+Hh7UsBT7q+Aa+PLfuwIfufe+jTSp47LE5M1ZLdf8whrZ5AS3RKR69NWQC/nXYdL3Q==",
       "type": "package",
-      "path": "system.io.pipelines/4.5.2",
+      "path": "system.io.pipelines/8.0.0-preview.4.23259.5",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
+        "Icon.png",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
-        "lib/netcoreapp2.1/System.IO.Pipelines.dll",
-        "lib/netcoreapp2.1/System.IO.Pipelines.xml",
-        "lib/netstandard1.3/System.IO.Pipelines.dll",
-        "lib/netstandard1.3/System.IO.Pipelines.xml",
+        "buildTransitive/net461/System.IO.Pipelines.targets",
+        "buildTransitive/net462/_._",
+        "buildTransitive/net6.0/_._",
+        "buildTransitive/netcoreapp2.0/System.IO.Pipelines.targets",
+        "lib/net462/System.IO.Pipelines.dll",
+        "lib/net462/System.IO.Pipelines.xml",
+        "lib/net6.0/System.IO.Pipelines.dll",
+        "lib/net6.0/System.IO.Pipelines.xml",
+        "lib/net7.0/System.IO.Pipelines.dll",
+        "lib/net7.0/System.IO.Pipelines.xml",
+        "lib/net8.0/System.IO.Pipelines.dll",
+        "lib/net8.0/System.IO.Pipelines.xml",
         "lib/netstandard2.0/System.IO.Pipelines.dll",
         "lib/netstandard2.0/System.IO.Pipelines.xml",
-        "ref/netstandard1.3/System.IO.Pipelines.dll",
-        "system.io.pipelines.4.5.2.nupkg.sha512",
+        "system.io.pipelines.8.0.0-preview.4.23259.5.nupkg.sha512",
         "system.io.pipelines.nuspec",
-        "useSharedDesignerContext.txt",
-        "version.txt"
+        "useSharedDesignerContext.txt"
       ]
     },
     "System.Memory/4.5.5": {
@@ -3926,6 +3981,7 @@
   "projectFileDependencyGroups": {
     "net7.0": [
       "Microsoft.AspNetCore.SignalR >= 1.1.0",
+      "Microsoft.AspNetCore.SignalR.Common >= 8.0.0-preview.4.23260.4",
       "Microsoft.Extensions.Hosting >= 8.0.0-preview.4.23259.5",
       "MongoDB.Driver >= 2.19.2",
       "PDTools.SimulatorInterface >= 1.0.0",
@@ -3977,6 +4033,10 @@
           "Microsoft.AspNetCore.SignalR": {
             "target": "Package",
             "version": "[1.1.0, )"
+          },
+          "Microsoft.AspNetCore.SignalR.Common": {
+            "target": "Package",
+            "version": "[8.0.0-preview.4.23260.4, )"
           },
           "Microsoft.Extensions.Hosting": {
             "target": "Package",

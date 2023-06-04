@@ -6,15 +6,16 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MongoDB.Driver" Version="2.19.2"/>
-    <PackageReference Include="Syroot.BinaryData" Version="5.2.2"/>
-    <PackageReference Include="Syroot.BinaryData.Memory" Version="5.2.2"/>
-    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0"/>
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0-preview.4.23259.5"/>
-    <PackageReference Include="Microsoft.AspNetCore.App" Version="3.0.0-preview3-19153-02"/>
+    <PackageReference Include="MongoDB.Driver" Version="2.19.2" />
+    <PackageReference Include="Syroot.BinaryData" Version="5.2.2" />
+    <PackageReference Include="Syroot.BinaryData.Memory" Version="5.2.2" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0-preview.4.23259.5" />
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="3.0.0-preview3-19153-02" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="8.0.0-preview.4.23260.4" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PDTools\PDTools.SimulatorInterface\PDTools.SimulatorInterface.csproj"/>
-    <ProjectReference Include="..\PDToolsPDTools.SimulatorInterface\PDTools.SimulatorInterfaceTestTool.csproj"/>
+    <ProjectReference Include="..\PDTools\PDTools.SimulatorInterface\PDTools.SimulatorInterface.csproj" />
+    <ProjectReference Include="..\PDToolsPDTools.SimulatorInterface\PDTools.SimulatorInterfaceTestTool.csproj" />
   </ItemGroup>
 </Project>
