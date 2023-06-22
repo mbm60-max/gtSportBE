@@ -17,8 +17,8 @@ using MongoDB.Driver;
 using System.Diagnostics;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-
-
+using System.Numerics;
+using PDTools.SimulatorInterface;
 
 namespace PDTools.SimulatorInterfaceTestTool
 {
@@ -29,7 +29,7 @@ namespace PDTools.SimulatorInterfaceTestTool
         private static string _collectionName;
 
         private static IHost host;
-        private static IHubContext<ThrottleHub> hubContext;
+        private static IHubContext<MyHub> hubContext;
         static async Task Main(string[] args)
         {
             /* Mostly a test sample for using the Simulator Interface library */
@@ -69,36 +69,31 @@ namespace PDTools.SimulatorInterfaceTestTool
                 type = SimulatorInterfaceGameType.GT6;
 
             byte throttleValue = 0;
-            Stopwatch stopWatch = null;
-            SimulatorInterfaceClient simInterface = new SimulatorInterfaceClient(args[0], type);
-            simInterface.OnReceive += (packet) => SimInterface_OnReceive(packet, ref throttleValue, ref stopWatch);
-
-            var cts = new CancellationTokenSource();
-
-            // Cancel token from outside source to end simulator
-            var task = simInterface.Start(cts.Token);
-            
+            Vector3 position = new Vector3(0,0,0);
             // Build the host
-            var host = CreateHostBuilder(args).Build();
+            host = CreateHostBuilder(args).Build();
 
             // Start the host in the background
             _ = host.RunAsync();
 
             // Get the hub context
             var serviceProvider = host.Services;
-            //Console.WriteLine(throttleValue);
-            hubContext = serviceProvider.GetRequiredService<IHubContext<ThrottleHub>>();
-            await hubContext.Clients.All.SendAsync("SendMessage", "max");
-           // await hubContext.Clients.All.SendAsync("ReceiveThrottleValue", throttleValue);
-           // Console.WriteLine(hubContext.Clients.All);
-           
+            hubContext = serviceProvider.GetRequiredService<IHubContext<MyHub>>();
+            Console.WriteLine("test");
+            Stopwatch stopWatch = null;
+            SimulatorInterfaceClient simInterface = new SimulatorInterfaceClient(args[0], type);
+            simInterface.OnReceive += (packet) => SimInterface_OnReceive(packet, ref throttleValue, hubContext, ref stopWatch, ref position);// ,ref stopWatch
+
+            var cts = new CancellationTokenSource();
+
+            // Cancel token from outside source to end simulator
+            var task = simInterface.Start(cts.Token);
+            byte CurrentLap = 0;
 
             try
             {
-                //hubContext.Clients.All.SendAsync("ReceiveThrottleValue", throttleValue);
-               // Console.WriteLine(hubContext);
-
-                await task;
+              Console.WriteLine("mad");
+              await task;
             }
             catch (OperationCanceledException e)
             {
@@ -120,15 +115,16 @@ namespace PDTools.SimulatorInterfaceTestTool
             }
         }
 
-        private delegate void SimInterfaceEventHandler(SimulatorPacket packet, byte throttleValue, ref Stopwatch stopwatch);
+        private delegate void SimInterfaceEventHandler(SimulatorPacket packet, byte throttleValue,IHubContext<MyHub> hubContext, ref Stopwatch stopwatch, ref Vector3 position);//, ref Stopwatch stopwatch
 
-        private static void SimInterface_OnReceive(SimulatorPacket packet,ref byte throttleValue, ref Stopwatch stopwatch)
+        private static void SimInterface_OnReceive(SimulatorPacket packet,ref byte throttleValue,IHubContext<MyHub> hubContext, ref Stopwatch stopwatch, ref Vector3 position, ref byte currentLap )//, ref Stopwatch stopwatch
         {
             // Print the packet contents to the console
             Console.SetCursorPosition(0, 0);
             //packet.PrintPacket(_showUnknown);
-            packet.PrintBasic(_showUnknown);
+            //packet.PrintBasic(_showUnknown);
             byte x = packet.giveThrottle();
+
             if (x > 0){
                 throttleValue = x;
                 Console.WriteLine();  
@@ -139,34 +135,37 @@ namespace PDTools.SimulatorInterfaceTestTool
                 else if (x > 100 && stopwatch != null){
                     EndTimer(ref stopwatch);
                 }
-                 hubContext.Clients.All.SendAsync("ReceiveThrottleValue", throttleValue);
             }
+            TestMessage(throttleValue,hubContext);
+            Console.WriteLine($"Position:  {packet.Position}");
+            PositionMessage(packet.Position,hubContext);//seems to not be working 
+
+
 
             // Get the game type the packet was issued from
             SimulatorInterfaceGameType gameType = packet.GameType;
              //InsertDocument(packet);
             // Check on flags for whether the simulation is active
-            if (packet.Flags.HasFlag(SimulatorFlags.CarOnTrack) && !packet.Flags.HasFlag(SimulatorFlags.Paused) && !packet.Flags.HasFlag(SimulatorFlags.LoadingOrProcessing)){
+            //if (packet.Flags.HasFlag(SimulatorFlags.CarOnTrack) && !packet.Flags.HasFlag(SimulatorFlags.Paused) && !packet.Flags.HasFlag(SimulatorFlags.LoadingOrProcessing)){
                 // Do stuff with packet
                 //InsertDocument(packet);
-            }
-             // Send throttle value to connected clients
-             //if(throttleValue!= null){
-               // hubContext.Clients.All.SendAsync("ReceiveThrottleValue", throttleValue);
-             //}
+            //}
         }
 
-        public static void InsertDocument(SimulatorPacket packet)
-        {
-            var collection = _database.GetCollection<SimulatorPacket>(_collectionName);
-            collection.InsertOne(packet);
-        }
+        //public static void InsertDocument(SimulatorPacket packet)
+        //{
+          //  var collection = _database.GetCollection<SimulatorPacket>(_collectionName);
+            //collection.InsertOne(packet);
+        //}
 
         public static void StartTimer( ref Stopwatch stopwatch)
         {
             //update the timer refrence to be a new timer object miliseconds
             stopwatch = new Stopwatch();
             stopwatch.Start();
+        }
+        public static void LapCompleted(ref byte currentLap,ref byte previousLap){
+            if 
         }
 
         public static void EndTimer(ref Stopwatch stopwatch){
@@ -215,32 +214,27 @@ namespace PDTools.SimulatorInterfaceTestTool
 
                 app.UseEndpoints(endpoints =>
                 {
-                    endpoints.MapHub<ThrottleHub>("/throttlehub");
+                     endpoints.MapHub<MyHub>("/throttlehub");
                 });
             });
         });
-
-    }
+        public class MyHub : Hub
+{
     
-
-    public class ThrottleHub : Hub
-    {
-        //public async Task ReceiveThrottleValue(byte throttleValue)
-        //{
-          //  Console.WriteLine($"Received throttle value: {throttleValue}");
-            //await Clients.All.SendAsync("ReceiveThrottleValue", throttleValue);
-        //}
-        public async Task SendMessage(string name)
-        {
-            try{
-                Console.WriteLine($"Received throttle value: {name}");
-                //await Clients.All.SendAsync("SendMessage", name);
-            }catch (Exception ex)
-    {
-        // Handle the exception and log the error
-        Console.WriteLine($"Error in ReceiveThrottleValue: {ex.Message}");
+    public async Task NewMessage(byte data){
+    //while (true){
+        await Clients.All.SendAsync("messageReceived", data);
+      //  await Task.Delay(1000);
+    //}
     }
-        }
-    }
-
 }
+private static async void TestMessage(byte data, IHubContext<MyHub> hubContext)
+        {
+            await hubContext.Clients.All.SendAsync("messageReceived", data);
+        }
+        private static async void PositionMessage(Vector3 position, IHubContext<MyHub> hubContext)
+        {
+            await hubContext.Clients.All.SendAsync("positionMessage", position);
+        }
+    
+}}

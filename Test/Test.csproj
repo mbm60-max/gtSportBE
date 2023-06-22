@@ -12,10 +12,14 @@
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0-preview.4.23259.5" />
     <PackageReference Include="Microsoft.AspNetCore.App" Version="3.0.0-preview3-19153-02" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="8.0.0-preview.4.23260.4" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PDTools\PDTools.SimulatorInterface\PDTools.SimulatorInterface.csproj" />
     <ProjectReference Include="..\PDToolsPDTools.SimulatorInterface\PDTools.SimulatorInterfaceTestTool.csproj" />
   </ItemGroup>
+  <ItemGroup>
+  <Reference Include="Microsoft.AspNetCore.SignalR" />
+</ItemGroup>
+
 </Project>
