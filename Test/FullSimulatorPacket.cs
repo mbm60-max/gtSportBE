@@ -1,3 +1,4 @@
+using PDTools.SimulatorInterface;
 namespace FullSimulatorPacket{
    internal class ExtendedPacket : SimulatorPacket
 {

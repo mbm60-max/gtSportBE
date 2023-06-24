@@ -25,7 +25,9 @@ using PacketHelpers;
 using PacketTimer;
 using ServerMessages;
 using LapCalculations;
-using  ServerHub;
+using ServerHub;
+using FullSimulatorPacket;
+
 namespace PDTools.SimulatorInterfaceTestTool
 {
     internal class Program
@@ -38,7 +40,7 @@ namespace PDTools.SimulatorInterfaceTestTool
         private static IHubContext<MyHub> hubContext;
         private static async Task Main(string[] args)
         {
-            
+
             /* Mostly a test sample for using the Simulator Interface library */
             //var connectionString = "mongodb+srv://maxbm:Kismetuni66@pdtoolcluster.een0p7c.mongodb.net/?retryWrites=true&w=majority";
             //var client = new MongoClient(connectionString);
@@ -163,9 +165,36 @@ namespace PDTools.SimulatorInterfaceTestTool
                 Console.WriteLine();
                 // Reset packet count to 0
                 PacketHelper.SummarizePacket(ref aggregation, ref packetCount);
+                ExtendedPacket extendedPacket = new ExtendedPacket();
+
+                // Get the type of the SimulatorPacket and ExtendedPacket
+                Type simulatorPacketType = typeof(SimulatorPacket);
+                Type extendedPacketType = typeof(ExtendedPacket);
+
+                // Get the properties of the SimulatorPacket
+                PropertyInfo[] properties = simulatorPacketType.GetProperties();
+
+                // Loop through the properties and copy their values
+                foreach (PropertyInfo property in properties)
+                {
+                    object value = property.GetValue(originalPacket);
+
+                    // Find the corresponding property in the ExtendedPacket
+                    PropertyInfo extendedProperty = extendedPacketType.GetProperty(property.Name);
+
+                    // Copy the value to the ExtendedPacket if the property exists
+                    if (extendedProperty != null)
+                    {
+                        extendedProperty.SetValue(extendedPacket, value);
+                    }
+                }
+                Message.FullPacketMessage(extendedPacket, hubContext);
+
+                // extendedPacket now contains the values from originalPacket
+
                 packetCount = 0;
-                //Messge.PositionMessage(packet.Position,hubContext);//seems to not be working 
-                
+                //Message.PositionMessage(packet.Position,hubContext);//seems to not be working 
+
                 aggregation = new SimulatorPacket();
                 //sendpacket
                 //reset aggregation packet to default
@@ -219,8 +248,8 @@ namespace PDTools.SimulatorInterfaceTestTool
                 });
             });
         });
-        
-        
-        
+
+
+
     }
 }
