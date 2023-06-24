@@ -21,7 +21,11 @@ using PDTools.SimulatorInterface;
 using System.Reflection;
 using Syroot.BinaryData.Memory;
 using System.IO;
-
+using PacketHelpers;
+using PacketTimer;
+using ServerMessages;
+using LapCalculations;
+using  ServerHub;
 namespace PDTools.SimulatorInterfaceTestTool
 {
     internal class Program
@@ -32,7 +36,7 @@ namespace PDTools.SimulatorInterfaceTestTool
 
         private static IHost host;
         private static IHubContext<MyHub> hubContext;
-        static async Task Main(string[] args)
+        private static async Task Main(string[] args)
         {
             
             /* Mostly a test sample for using the Simulator Interface library */
@@ -131,7 +135,7 @@ namespace PDTools.SimulatorInterfaceTestTool
             byte x = packet.giveThrottle();
             short currentLap = packet.LapCount;
             packetCount++;
-            if (LapCompleted(ref currentLap, ref previousLap))
+            if (LapCalc.LapCompleted(ref currentLap, ref previousLap))
             {
                 //start timer,calc distance
                 previousLap = currentLap;
@@ -144,41 +148,30 @@ namespace PDTools.SimulatorInterfaceTestTool
             //Console.WriteLine("Current Throttle value: " +  throttleValue.ToString().PadLeft(3));
             if (stopwatch == null)
             {
-                StartTimer(ref stopwatch);
-                AggregatePacket(ref packet, ref aggregation);
+                PacketTimerClass.StartTimer(ref stopwatch);
+                PacketHelper.AggregatePacket(ref packet, ref aggregation);
                 return;
             }
             else if (stopwatch.Elapsed.TotalSeconds > 0.1 && stopwatch != null)
             {
-                EndTimer(ref stopwatch);
-                TestMessage(throttleValue, hubContext);
-                AggregatePacket(ref packet, ref aggregation);
+                PacketTimerClass.EndTimer(ref stopwatch);
+                Message.TestMessage(throttleValue, hubContext);
+                PacketHelper.AggregatePacket(ref packet, ref aggregation);
                 Console.WriteLine($"Position:  {packet.Position}");
                 Console.WriteLine();
                 Console.WriteLine("Packet Count: " + packetCount);
                 Console.WriteLine();
                 // Reset packet count to 0
-                SummarizePacket(ref aggregation, ref packetCount);
+                PacketHelper.SummarizePacket(ref aggregation, ref packetCount);
                 packetCount = 0;
-                //PositionMessage(packet.Position,hubContext);//seems to not be working 
+                //Messge.PositionMessage(packet.Position,hubContext);//seems to not be working 
                 
                 aggregation = new SimulatorPacket();
                 //sendpacket
                 //reset aggregation packet to default
                 return;
             }
-            AggregatePacket(ref packet, ref aggregation);
-            
-
-
-            // Get the game type the packet was issued from
-            //SimulatorInterfaceGameType gameType = packet.GameType;
-            //InsertDocument(packet);
-            // Check on flags for whether the simulation is active
-            //if (packet.Flags.HasFlag(SimulatorFlags.CarOnTrack) && !packet.Flags.HasFlag(SimulatorFlags.Paused) && !packet.Flags.HasFlag(SimulatorFlags.LoadingOrProcessing)){
-            // Do stuff with packet
-            //InsertDocument(packet);
-            //}
+            PacketHelper.AggregatePacket(ref packet, ref aggregation);
         }
 
         //public static void InsertDocument(SimulatorPacket packet)
@@ -187,150 +180,7 @@ namespace PDTools.SimulatorInterfaceTestTool
         //collection.InsertOne(packet);
         //}
 
-        public static void StartTimer(ref Stopwatch stopwatch)
-        {
-            //update the timer refrence to be a new timer object miliseconds
-            stopwatch = new Stopwatch();
-            stopwatch.Start();
-        }
-        public static Boolean LapCompleted(ref short currentLap, ref short previousLap)
-        {
-            if ((currentLap > 0) && (currentLap > previousLap))
-            {
-                return true;
-            }
-            return false;
-        }
-
-        public static void RecordDistance(float MetersPerSecond, TimeSpan ElapsedTime)
-        {
-
-
-        }
-
-        public static SimulatorPacket AggregatePacket(ref SimulatorPacket packet, ref SimulatorPacket aggregation)
-        {
-            Type packetType = typeof(SimulatorPacket);
-            PropertyInfo[] properties = packetType.GetProperties();
-
-            foreach (PropertyInfo property in properties)
-            {
-                var packetValue = property.GetValue(packet);
-                var aggregationValue = property.GetValue(aggregation);
-                switch (packetValue)
-                {
-                    case byte packetByte when aggregationValue is byte:
-                        // Handle Vector3 case
-                        byte packetByteData = (byte)packetValue;
-                        byte aggregationByte = (byte)aggregationValue;
-                        aggregationValue = (byte)(aggregationByte + packetByteData);
-                        property.SetValue(aggregation, aggregationValue);
-                        break;
-                    case float packetFloat when aggregationValue is float:
-
-                        float packetFloatData = (float)packetValue;
-                        float aggregationFloat = (float)aggregationValue;
-                        aggregationValue = (float)(aggregationFloat + packetFloatData);
-                        property.SetValue(aggregation, aggregationValue);
-                        break;
-
-                    case int packetInt when aggregationValue is int:
-
-                        int packetIntData = (int)packetValue;
-                        int aggregationInt = (int)aggregationValue;
-                        aggregationValue = (int)(aggregationInt + packetIntData);
-                        property.SetValue(aggregation, aggregationValue);
-                        break;
-
-                    case short packetShort when aggregationValue is short:
-
-                        short packetShortData = (short)packetValue;
-                        short aggregationShort = (short)aggregationValue;
-                        aggregationValue = (short)(aggregationShort + packetShortData);
-                        property.SetValue(aggregation, aggregationValue);
-                        break;
-
-                    case long packetLong when aggregationValue is long:
-
-                        long packetLongData = (long)packetValue;
-                        long aggregationLong = (long)aggregationValue;
-                        aggregationValue = (long)(aggregationLong + packetLongData);
-                        property.SetValue(aggregation, aggregationValue);
-                        break;
-
-                    case double packetDouble when aggregationValue is double:
-
-                        double packetDoubleData = (double)packetValue;
-                        double aggregationDouble = (double)aggregationValue;
-                        aggregationValue = (double)(aggregationDouble + packetDoubleData);
-                        property.SetValue(aggregation, aggregationValue);
-                        break;
-
-                    case SimulatorFlags packetFlags when aggregationValue is SimulatorFlags:
-
-                        aggregationValue = (SimulatorFlags)packetValue;
-                        property.SetValue(aggregation, aggregationValue);
-                        break;
-
-                    case Vector3 packetVector3 when aggregationValue is Vector3:
-
-                        Vector3 packetVector3Data = (Vector3)packetValue;
-                        Vector3 aggregationVector3 = (Vector3)aggregationValue;
-                        aggregationValue = Vector3.Add(aggregationVector3, packetVector3Data);
-                        property.SetValue(aggregation, aggregationValue);
-                        break;
-
-                    case TimeSpan packetTimeSpan when aggregationValue is TimeSpan:
-                        aggregationValue = (TimeSpan)packetValue;
-                        property.SetValue(aggregation, aggregationValue);
-                        break;
-
-                    case SimulatorInterfaceGameType packetGameType when aggregationValue is SimulatorInterfaceGameType:
-                        aggregationValue = (SimulatorInterfaceGameType)packetValue;
-                        property.SetValue(aggregation, aggregationValue);
-                        break;
-
-                    case DateTimeOffset packetDateTimeOffset when aggregationValue is DateTimeOffset:
-                        aggregationValue = (DateTimeOffset)packetValue;
-                        property.SetValue(aggregation, aggregationValue);
-                        break;
-
-                    case IPEndPoint packetIPEndPoint when aggregationValue is IPEndPoint:
-                        aggregationValue = (IPEndPoint)packetValue;
-                        Console.WriteLine(aggregationValue);
-                        property.SetValue(aggregation, aggregationValue);
-                        break;
-
-                    case float[] packetFloatArray when aggregationValue is float[]:
-                        aggregationValue = (float[])packetValue;
-                        property.SetValue(aggregation, aggregationValue);
-                        break;
-
-                    default:
-                        // Default case when none of the above conditions match
-                        break;
-                }
-            }
-
-
-
-            return aggregation;
-        }
-
-        public static void EndTimer(ref Stopwatch stopwatch)
-        {
-            if (stopwatch != null)
-            {
-                stopwatch.Stop();
-                TimeSpan ts = stopwatch.Elapsed;
-                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-                    ts.Hours, ts.Minutes, ts.Seconds,
-                    ts.Milliseconds / 10);
-                Console.WriteLine("RunTime " + elapsedTime);
-                stopwatch = null;
-            }
-        }
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
+        private static IHostBuilder CreateHostBuilder(string[] args) =>
     Host.CreateDefaultBuilder(args)
         .ConfigureWebHostDefaults(webBuilder =>
         {
@@ -369,70 +219,8 @@ namespace PDTools.SimulatorInterfaceTestTool
                 });
             });
         });
-        public class MyHub : Hub
-        {
-
-            public async Task NewMessage(byte data)
-            {
-                //while (true){
-                await Clients.All.SendAsync("messageReceived", data);
-                //  await Task.Delay(1000);
-                //}
-            }
-        }
-        private static async void TestMessage(byte data, IHubContext<MyHub> hubContext)
-        {
-            await hubContext.Clients.All.SendAsync("messageReceived", data);
-        }
-        private static async void PositionMessage(Vector3 position, IHubContext<MyHub> hubContext)
-        {
-            await hubContext.Clients.All.SendAsync("positionMessage", position);
-        }
-        public static SimulatorPacket SummarizePacket(ref SimulatorPacket aggregation, ref int packetCount)
-        {
-            Type packetType = typeof(SimulatorPacket);
-            PropertyInfo[] properties = packetType.GetProperties();
-
-            foreach (PropertyInfo property in properties)
-            {
-                var aggregationValue = property.GetValue(aggregation);
-
-                switch (aggregationValue)
-                {
-                    case byte aggregationByte:
-                        property.SetValue(aggregation, (byte)(aggregationByte / packetCount));
-                        break;
-
-                    case float aggregationFloat:
-                        property.SetValue(aggregation, (float)(aggregationFloat / packetCount));
-                        break;
-
-                    case double aggregationDouble:
-                        property.SetValue(aggregation, (double)(aggregationDouble / packetCount));
-                        break;
-
-                    case int aggregationInt:
-                        property.SetValue(aggregation, (int)(aggregationInt / packetCount));
-                        break;
-
-                    case short aggregationShort:
-                        property.SetValue(aggregation, (short)(aggregationShort / packetCount));
-                        break;
-
-                    case long aggregationLong:
-                        property.SetValue(aggregation, (long)(aggregationLong / packetCount));
-                        break;
-
-                    case Vector3 aggregationVector3 :
-                        property.SetValue(aggregation, (Vector3)(aggregationVector3 / packetCount));
-                        break;
-                    default:
-                        property.SetValue(aggregation, aggregationValue);
-                        break;
-                }
-            }
-
-            return aggregation;
-        }
+        
+        
+        
     }
 }

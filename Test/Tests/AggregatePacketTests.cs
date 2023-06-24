@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Xunit;
 using PDTools.SimulatorInterfaceTestTool;
 using PDTools.SimulatorInterface;
+using PacketHelpers;
 
 namespace PDTools.SimulatorInterfaceTestTool.Tests
 {
@@ -99,7 +100,7 @@ namespace PDTools.SimulatorInterfaceTestTool.Tests
             };
 
             // Act
-            SimulatorPacket result = Program.AggregatePacket(ref packet, ref aggregation);
+            SimulatorPacket result = PacketHelper.AggregatePacket(ref packet, ref aggregation);
 
             // Assert
             Assert.Equal(expectedAggregation, result);
