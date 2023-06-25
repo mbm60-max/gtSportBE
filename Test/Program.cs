@@ -92,9 +92,10 @@ namespace PDTools.SimulatorInterfaceTestTool
             short previousLap = 0;
             float inLapDistance = 0;
             SimulatorPacket aggregation = new SimulatorPacket { };
+            ExtendedPacket extendedPacket = new ExtendedPacket();
             int packetCount = 0;
             SimulatorInterfaceClient simInterface = new SimulatorInterfaceClient(args[0], type);
-            simInterface.OnReceive += (packet) => SimInterface_OnReceive(packet, ref throttleValue, hubContext, ref stopWatch, ref position, ref previousLap, ref inLapDistance, ref aggregation, ref packetCount);// ,ref stopWatch
+            simInterface.OnReceive += (packet) => SimInterface_OnReceive(packet, ref throttleValue, hubContext, ref stopWatch, ref position, ref previousLap, ref inLapDistance, ref aggregation, ref packetCount, ref extendedPacket);// ,ref stopWatch
 
             var cts = new CancellationTokenSource();
 
@@ -126,9 +127,9 @@ namespace PDTools.SimulatorInterfaceTestTool
             }
         }
 
-        private delegate void SimInterfaceEventHandler(SimulatorPacket packet, byte throttleValue, IHubContext<MyHub> hubContext, ref Stopwatch stopwatch, ref Vector3 position, ref short previousLap, ref float inLapDistance, ref SimulatorPacket aggregation, ref int packetCount);//, ref Stopwatch stopwatch
+        private delegate void SimInterfaceEventHandler(SimulatorPacket packet, byte throttleValue, IHubContext<MyHub> hubContext, ref Stopwatch stopwatch, ref Vector3 position, ref short previousLap, ref float inLapDistance, ref SimulatorPacket aggregation, ref int packetCount,ref ExtendedPacket extendedPacket);//, ref Stopwatch stopwatch
 
-        private static void SimInterface_OnReceive(SimulatorPacket packet, ref byte throttleValue, IHubContext<MyHub> hubContext, ref Stopwatch stopwatch, ref Vector3 position, ref short previousLap, ref float inLapDistance, ref SimulatorPacket aggregation, ref int packetCount)//, ref Stopwatch stopwatch
+        private static void SimInterface_OnReceive(SimulatorPacket packet, ref byte throttleValue, IHubContext<MyHub> hubContext, ref Stopwatch stopwatch, ref Vector3 position, ref short previousLap, ref float inLapDistance, ref SimulatorPacket aggregation, ref int packetCount,ref ExtendedPacket extendedPacket)//, ref Stopwatch stopwatch
         {
             // Print the packet contents to the console
             Console.SetCursorPosition(0, 0);
@@ -165,7 +166,7 @@ namespace PDTools.SimulatorInterfaceTestTool
                 Console.WriteLine();
                 // Reset packet count to 0
                 PacketHelper.SummarizePacket(ref aggregation, ref packetCount);
-                ExtendedPacket extendedPacket = new ExtendedPacket();
+                
 
                 // Get the type of the SimulatorPacket and ExtendedPacket
                 Type simulatorPacketType = typeof(SimulatorPacket);
@@ -177,7 +178,7 @@ namespace PDTools.SimulatorInterfaceTestTool
                 // Loop through the properties and copy their values
                 foreach (PropertyInfo property in properties)
                 {
-                    object value = property.GetValue(originalPacket);
+                    object value = property.GetValue(packet);
 
                     // Find the corresponding property in the ExtendedPacket
                     PropertyInfo extendedProperty = extendedPacketType.GetProperty(property.Name);
@@ -188,8 +189,13 @@ namespace PDTools.SimulatorInterfaceTestTool
                         extendedProperty.SetValue(extendedPacket, value);
                     }
                 }
+                extendedPacket.distanceFromStart = 5.0f;
                 Message.FullPacketMessage(extendedPacket, hubContext);
-
+                PropertyInfo[] properties2 = typeof(ExtendedPacket).GetProperties();
+                foreach (PropertyInfo property in properties2)
+                {
+                     Console.WriteLine($"{property.Name}: {property.GetValue(extendedPacket)}");
+                }
                 // extendedPacket now contains the values from originalPacket
 
                 packetCount = 0;

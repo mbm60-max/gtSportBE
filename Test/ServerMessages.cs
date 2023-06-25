@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.SignalR;
 using System.Numerics;
 using System.Threading.Tasks;
 using ServerHub;
+using PDTools.SimulatorInterface;
 
 namespace ServerMessages{
     internal static class Message{
@@ -13,6 +14,10 @@ namespace ServerMessages{
         internal static async void PositionMessage(Vector3 position, IHubContext<MyHub> hubContext)
         {
             await hubContext.Clients.All.SendAsync("positionMessage", position);
+        }
+        internal static async void FullPacketMessage(SimulatorPacket packet, IHubContext<MyHub> hubContext)
+        {
+            await hubContext.Clients.All.SendAsync("positionMessage", packet);
         }
     }
 }
