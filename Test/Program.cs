@@ -134,7 +134,7 @@ namespace PDTools.SimulatorInterfaceTestTool
             // Print the packet contents to the console
             Console.SetCursorPosition(0, 0);
             //packet.PrintPacket(_showUnknown);
-            //packet.PrintBasic(_showUnknown);
+           // packet.PrintBasic(_showUnknown);
             byte x = packet.giveThrottle();
             short currentLap = packet.LapCount;
             packetCount++;
@@ -158,7 +158,8 @@ namespace PDTools.SimulatorInterfaceTestTool
             else if (stopwatch.Elapsed.TotalSeconds > 0.1 && stopwatch != null)
             {
                 PacketTimerClass.EndTimer(ref stopwatch);
-                Message.TestMessage(throttleValue, hubContext);
+                //throttleValue=packet.Throttle;
+                //Message.TestMessage(throttleValue, hubContext);
                 PacketHelper.AggregatePacket(ref packet, ref aggregation);
                 Console.WriteLine($"Position:  {packet.Position}");
                 Console.WriteLine();
@@ -184,18 +185,37 @@ namespace PDTools.SimulatorInterfaceTestTool
                     PropertyInfo extendedProperty = extendedPacketType.GetProperty(property.Name);
 
                     // Copy the value to the ExtendedPacket if the property exists
-                    if (extendedProperty != null)
+                    if (extendedProperty != null && extendedProperty.PropertyType == property.PropertyType)
                     {
                         extendedProperty.SetValue(extendedPacket, value);
+                    }else if(property.PropertyType == typeof(Vector3)){
+                        Vector3 vectorValue = (Vector3)value;
+                        string[] storageArray = new string[3];
+                        storageArray[0] = vectorValue.X.ToString();
+                        storageArray[1] = vectorValue.Y.ToString();
+                        storageArray[2] = vectorValue.Z.ToString();
+                        extendedProperty.SetValue(extendedPacket, storageArray);
+                    }else if(extendedProperty != null){
+                        extendedProperty.SetValue(extendedPacket, value.ToString());
                     }
                 }
                 extendedPacket.distanceFromStart = 5.0f;
+                Console.WriteLine(extendedPacket.DateReceived);
+                Console.WriteLine(extendedPacket.RoadPlane[0]);
+                Message.PositionMessage(extendedPacket.Position,hubContext);
+                //Message.StringMessage(extendedPacket.DateReceived,hubContext);
+                //Message.FloatMessage(extendedPacket.distanceFromStart,hubContext);
+                //Message.SimGameMessage(extendedPacket.GameType,hubContext);
+                //Message.IntMessage(extendedPacket.PacketId,hubContext);
+                //Message.ShortMessage(extendedPacket.LapCount,hubContext);
+                //Message.FlagsMessage(extendedPacket.Flags,hubContext);
+                //Message.FloatArrayMessage(extendedPacket.GearRatios,hubContext);
                 Message.FullPacketMessage(extendedPacket, hubContext);
-                PropertyInfo[] properties2 = typeof(ExtendedPacket).GetProperties();
-                foreach (PropertyInfo property in properties2)
-                {
-                     Console.WriteLine($"{property.Name}: {property.GetValue(extendedPacket)}");
-                }
+               // PropertyInfo[] properties2 = typeof(ExtendedPacket).GetProperties();
+               // foreach (PropertyInfo property in properties2)
+               // {
+                 //    Console.WriteLine($"{property.Name}: {property.GetValue(extendedPacket)}");
+               // }
                 // extendedPacket now contains the values from originalPacket
 
                 packetCount = 0;

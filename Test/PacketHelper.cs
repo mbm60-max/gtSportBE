@@ -53,7 +53,7 @@ internal static class PacketHelper
 
             return aggregation;
         }
-        internal static SimulatorPacket AggregatePacket(ref SimulatorPacket packet, ref SimulatorPacket aggregation)
+    internal static SimulatorPacket AggregatePacket(ref SimulatorPacket packet, ref SimulatorPacket aggregation)
         {
             Type packetType = typeof(SimulatorPacket);
             PropertyInfo[] properties = packetType.GetProperties();

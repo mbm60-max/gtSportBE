@@ -5,7 +5,7 @@ SimulatorPacket result = RunAggregatePacketTest();
                 Console.WriteLine($"{property.Name}: {property.GetValue(result)}");
             }
             int number =8;
-            SimulatorPacket result2 =SummarizePacket(ref result,ref  number);
+            SimulatorPacket result2 = PacketHelpers.SummarizePacket(ref result,ref  number);
             Console.WriteLine();
             Console.WriteLine();
             Console.WriteLine();
@@ -143,5 +143,5 @@ SimulatorPacket result = RunAggregatePacketTest();
                 };
         
                 // Act
-                return AggregatePacket(ref packet, ref aggregation);
+                return PacketHelpers.AggregatePacket(ref packet, ref aggregation);
             }
