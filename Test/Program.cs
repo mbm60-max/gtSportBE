@@ -243,7 +243,7 @@ namespace PDTools.SimulatorInterfaceTestTool
             {
                 services.AddCors(options =>
                 {
-                    options.AddDefaultPolicy(builder =>
+                    options.AddPolicy("CorsPolicy",builder =>
                     {
                         builder.WithOrigins("http://localhost:3000")
                             .AllowAnyHeader()
@@ -266,11 +266,11 @@ namespace PDTools.SimulatorInterfaceTestTool
                 app.UseRouting();
                 app.UseDeveloperExceptionPage();
 
-                app.UseCors(); // Add this line to enable CORS
+                app.UseCors("CorsPolicy"); // Add this line to enable CORS
 
                 app.UseEndpoints(endpoints =>
                 {
-                    endpoints.MapHub<MyHub>("/throttlehub");
+                    endpoints.MapHub<MyHub>("/server");
                 });
             });
         });
