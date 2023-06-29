@@ -132,10 +132,10 @@ namespace PDTools.SimulatorInterfaceTestTool
         private static void SimInterface_OnReceive(SimulatorPacket packet, ref byte throttleValue, IHubContext<MyHub> hubContext, ref Stopwatch stopwatch, ref Vector3 position, ref short previousLap, ref float inLapDistance, ref SimulatorPacket aggregation, ref int packetCount,ref ExtendedPacket extendedPacket)//, ref Stopwatch stopwatch
         {
             // Print the packet contents to the console
-            Console.SetCursorPosition(0, 0);
+            ///Console.SetCursorPosition(0, 0);
             //packet.PrintPacket(_showUnknown);
            // packet.PrintBasic(_showUnknown);
-            byte x = packet.giveThrottle();
+            //byte x = packet.giveThrottle();
             short currentLap = packet.LapCount;
             packetCount++;
             if (LapCalc.LapCompleted(ref currentLap, ref previousLap))
@@ -147,7 +147,7 @@ namespace PDTools.SimulatorInterfaceTestTool
             }
             //inLapDistance += getElapsedDistance(packet.MetersPerSecond, ElapsedTime);
 
-
+            //Console.WriteLine("Current Throttle value: ");
             //Console.WriteLine("Current Throttle value: " +  throttleValue.ToString().PadLeft(3));
             if (stopwatch == null)
             {
@@ -161,10 +161,10 @@ namespace PDTools.SimulatorInterfaceTestTool
                 //throttleValue=packet.Throttle;
                 //Message.TestMessage(throttleValue, hubContext);
                 PacketHelper.AggregatePacket(ref packet, ref aggregation);
-                Console.WriteLine($"Position:  {packet.Position}");
-                Console.WriteLine();
-                Console.WriteLine("Packet Count: " + packetCount);
-                Console.WriteLine();
+                //Console.WriteLine($"Position:  {packet.Position}");
+                //Console.WriteLine();
+               // Console.WriteLine("Packet Count: " + packetCount);
+               // Console.WriteLine();
                 // Reset packet count to 0
                 PacketHelper.SummarizePacket(ref aggregation, ref packetCount);
                 
@@ -200,8 +200,8 @@ namespace PDTools.SimulatorInterfaceTestTool
                     }
                 }
                 extendedPacket.distanceFromStart = 5.0f;
-                Console.WriteLine(extendedPacket.DateReceived);
-                Console.WriteLine(extendedPacket.RoadPlane[0]);
+                //Console.WriteLine(extendedPacket.DateReceived);
+               // Console.WriteLine(extendedPacket.RoadPlane[0]);
                 Message.PositionMessage(extendedPacket.Position,hubContext);
                 //Message.StringMessage(extendedPacket.DateReceived,hubContext);
                 //Message.FloatMessage(extendedPacket.distanceFromStart,hubContext);
