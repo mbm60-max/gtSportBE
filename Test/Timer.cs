@@ -23,6 +23,20 @@
                 stopwatch = null;
             }
         }
+        internal static void ResumeTimer(ref Stopwatch stopwatch)
+        {
+            if (stopwatch != null && !stopwatch.IsRunning)
+            {
+                stopwatch.Start();
+            }
+        }
+        internal static void PauseTimer(ref Stopwatch stopwatch)
+        {
+            if (stopwatch != null && stopwatch.IsRunning)
+            {
+                stopwatch.Stop();
+            }
+        }
     }
  }
  

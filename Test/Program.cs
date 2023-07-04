@@ -138,6 +138,14 @@ namespace PDTools.SimulatorInterfaceTestTool
            // packet.PrintBasic(_showUnknown);
             //byte x = packet.giveThrottle();
             short currentLap = packet.LapCount;
+            if ((packet.Flags & SimulatorFlags.Paused) != 0)
+            {
+                PacketTimerClass.PauseTimer(ref lapTimeStopWatch);
+            }
+            else if ((packet.Flags & SimulatorFlags.Paused) == 0)
+            {
+                PacketTimerClass.ResumeTimer(ref lapTimeStopWatch);
+            }
             if(currentLap>previousLap){
                 previousLap=currentLap;
                 lapTimeStopWatch=null;
