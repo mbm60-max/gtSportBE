@@ -290,5 +290,7 @@ namespace FullSimulatorPacket{
         /// <para>This value may be overriden if using a car that uses 9 or more gears (oversight).</para>
         /// </summary>
         public int CarCode { get; set; }
+
+        public string LapTiming {get; set;}
 } 
 }
