@@ -94,9 +94,11 @@ namespace PDTools.SimulatorInterfaceTestTool
             SimulatorPacket aggregation = new SimulatorPacket { };
             ExtendedPacket extendedPacket = new ExtendedPacket();
             int packetCount = 0;
+            int inLapShifts = 0;
+            byte GearSelected;
             SimulatorInterfaceClient simInterface = new SimulatorInterfaceClient(args[0], type);
             short previousLap = 0;
-            simInterface.OnReceive += (packet) => SimInterface_OnReceive(packet, ref throttleValue, hubContext, ref stopWatch, ref position,  ref inLapDistance, ref aggregation, ref packetCount, ref extendedPacket, ref previousLap, ref lapTimeStopWatch);
+            simInterface.OnReceive += (packet) => SimInterface_OnReceive(packet, ref throttleValue, hubContext, ref stopWatch, ref position,  ref inLapDistance, ref aggregation, ref packetCount, ref extendedPacket, ref previousLap, ref lapTimeStopWatch, ref inLapShifts, ref GearSelected);
 
             var cts = new CancellationTokenSource();
 
@@ -128,9 +130,9 @@ namespace PDTools.SimulatorInterfaceTestTool
             }
         }
 
-        private delegate void SimInterfaceEventHandler(SimulatorPacket packet, byte throttleValue, IHubContext<MyHub> hubContext, ref Stopwatch stopwatch, ref Vector3 position,  ref float inLapDistance, ref SimulatorPacket aggregation, ref int packetCount,ref ExtendedPacket extendedPacket, ref short previousLap, ref Stopwatch lapTimeStopWatch);//, ref Stopwatch stopwatch
+        private delegate void SimInterfaceEventHandler(SimulatorPacket packet, byte throttleValue, IHubContext<MyHub> hubContext, ref Stopwatch stopwatch, ref Vector3 position,  ref float inLapDistance, ref SimulatorPacket aggregation, ref int packetCount,ref ExtendedPacket extendedPacket, ref short previousLap, ref Stopwatch lapTimeStopWatch,ref int inLapShifts, ref byte GearSelected);//, ref Stopwatch stopwatch
 
-        private static void SimInterface_OnReceive(SimulatorPacket packet, ref byte throttleValue, IHubContext<MyHub> hubContext, ref Stopwatch stopwatch, ref Vector3 position, ref float inLapDistance, ref SimulatorPacket aggregation, ref int packetCount,ref ExtendedPacket extendedPacket, ref short previousLap, ref Stopwatch lapTimeStopWatch)//, ref Stopwatch stopwatch
+        private static void SimInterface_OnReceive(SimulatorPacket packet, ref byte throttleValue, IHubContext<MyHub> hubContext, ref Stopwatch stopwatch, ref Vector3 position, ref float inLapDistance, ref SimulatorPacket aggregation, ref int packetCount,ref ExtendedPacket extendedPacket, ref short previousLap, ref Stopwatch lapTimeStopWatch, ref int inLapShifts, ref byte GearSelected)//, ref Stopwatch stopwatch
         {
             // Print the packet contents to the console
             ///Console.SetCursorPosition(0, 0);
@@ -138,6 +140,23 @@ namespace PDTools.SimulatorInterfaceTestTool
            // packet.PrintBasic(_showUnknown);
             //byte x = packet.giveThrottle();
             short currentLap = packet.LapCount;
+            if (packet.CurrentGear != GearSelected)
+            {
+                bool currentGearIsLarger = packet.CurrentGear > GearSelected;
+                byte dif;
+    
+                if (currentGearIsLarger)
+                {
+                     dif = (byte)(packet.CurrentGear - GearSelected);
+                }
+                else
+                {
+                     dif = (byte)(GearSelected - packet.CurrentGear);
+                }
+
+                inLapShifts += dif;
+            }
+
             if ((packet.Flags & SimulatorFlags.Paused) != 0)
             {
                 PacketTimerClass.PauseTimer(ref lapTimeStopWatch);
@@ -148,6 +167,7 @@ namespace PDTools.SimulatorInterfaceTestTool
             }
             if(currentLap>previousLap){
                 previousLap=currentLap;
+                inLapShifts=0;
                 lapTimeStopWatch=null;
             }
             if (lapTimeStopWatch == null)
@@ -214,6 +234,7 @@ namespace PDTools.SimulatorInterfaceTestTool
                 }
                 extendedPacket.distanceFromStart = 5.0f;
                 extendedPacket.LapTiming=lapTimeStopWatch.Elapsed.TotalSeconds.ToString("0.########");;//convert to string
+                extendedPacket.InLapShifts=inLapShifts;
                 //Console.WriteLine(extendedPacket.DateReceived);
                // Console.WriteLine(extendedPacket.RoadPlane[0]);
                 //Message.PositionMessage(extendedPacket.Position,hubContext);

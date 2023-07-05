@@ -292,5 +292,7 @@ namespace FullSimulatorPacket{
         public int CarCode { get; set; }
 
         public string LapTiming {get; set;}
+
+        public int InLapShifts {get; set;}
 } 
 }
