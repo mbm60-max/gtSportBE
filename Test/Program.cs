@@ -90,15 +90,16 @@ namespace PDTools.SimulatorInterfaceTestTool
 
             Stopwatch stopWatch = null;
             Stopwatch lapTimeStopWatch = null;
-            float inLapDistance = 0;
+            double inLapDistance = 0.0;
             SimulatorPacket aggregation = new SimulatorPacket { };
             ExtendedPacket extendedPacket = new ExtendedPacket();
             int packetCount = 0;
             int inLapShifts = 0;
-            byte GearSelected;
+            double packetReceivalTime = 0.0;
+            byte GearSelected = 0;
             SimulatorInterfaceClient simInterface = new SimulatorInterfaceClient(args[0], type);
             short previousLap = 0;
-            simInterface.OnReceive += (packet) => SimInterface_OnReceive(packet, ref throttleValue, hubContext, ref stopWatch, ref position,  ref inLapDistance, ref aggregation, ref packetCount, ref extendedPacket, ref previousLap, ref lapTimeStopWatch, ref inLapShifts, ref GearSelected);
+            simInterface.OnReceive += (packet) => SimInterface_OnReceive(packet, ref throttleValue, hubContext, ref stopWatch, ref position,  ref inLapDistance, ref aggregation, ref packetCount, ref extendedPacket, ref previousLap, ref lapTimeStopWatch, ref inLapShifts, ref GearSelected,ref packetReceivalTime);
 
             var cts = new CancellationTokenSource();
 
@@ -130,9 +131,9 @@ namespace PDTools.SimulatorInterfaceTestTool
             }
         }
 
-        private delegate void SimInterfaceEventHandler(SimulatorPacket packet, byte throttleValue, IHubContext<MyHub> hubContext, ref Stopwatch stopwatch, ref Vector3 position,  ref float inLapDistance, ref SimulatorPacket aggregation, ref int packetCount,ref ExtendedPacket extendedPacket, ref short previousLap, ref Stopwatch lapTimeStopWatch,ref int inLapShifts, ref byte GearSelected);//, ref Stopwatch stopwatch
+        private delegate void SimInterfaceEventHandler(SimulatorPacket packet, byte throttleValue, IHubContext<MyHub> hubContext, ref Stopwatch stopwatch, ref Vector3 position,  ref double inLapDistance, ref SimulatorPacket aggregation, ref int packetCount,ref ExtendedPacket extendedPacket, ref short previousLap, ref Stopwatch lapTimeStopWatch,ref int inLapShifts, ref byte GearSelected, ref double packetReceivalTime);//, ref Stopwatch stopwatch
 
-        private static void SimInterface_OnReceive(SimulatorPacket packet, ref byte throttleValue, IHubContext<MyHub> hubContext, ref Stopwatch stopwatch, ref Vector3 position, ref float inLapDistance, ref SimulatorPacket aggregation, ref int packetCount,ref ExtendedPacket extendedPacket, ref short previousLap, ref Stopwatch lapTimeStopWatch, ref int inLapShifts, ref byte GearSelected)//, ref Stopwatch stopwatch
+        private static void SimInterface_OnReceive(SimulatorPacket packet, ref byte throttleValue, IHubContext<MyHub> hubContext, ref Stopwatch stopwatch, ref Vector3 position, ref double inLapDistance, ref SimulatorPacket aggregation, ref int packetCount,ref ExtendedPacket extendedPacket, ref short previousLap, ref Stopwatch lapTimeStopWatch, ref int inLapShifts, ref byte GearSelected, ref double packetReceivalTime)//, ref Stopwatch stopwatch
         {
             // Print the packet contents to the console
             ///Console.SetCursorPosition(0, 0);
@@ -182,7 +183,7 @@ namespace PDTools.SimulatorInterfaceTestTool
                 inLapDistance = 0;
 
             }
-            //inLapDistance += getElapsedDistance(packet.MetersPerSecond, ElapsedTime);
+            inLapDistance += LapCalc.RecordDistance(packet.MetersPerSecond, stopwatch.Elapsed.TotalSeconds, packetReceivalTime);
 
             if (stopwatch == null)
             {
@@ -232,7 +233,7 @@ namespace PDTools.SimulatorInterfaceTestTool
                         extendedProperty.SetValue(extendedPacket, value.ToString());
                     }
                 }
-                extendedPacket.distanceFromStart = 5.0f;
+                extendedPacket.distanceFromStart = inLapDistance;
                 extendedPacket.LapTiming=lapTimeStopWatch.Elapsed.TotalSeconds.ToString("0.########");;//convert to string
                 extendedPacket.InLapShifts=inLapShifts;
                 //Console.WriteLine(extendedPacket.DateReceived);
@@ -259,9 +260,11 @@ namespace PDTools.SimulatorInterfaceTestTool
                 aggregation = new SimulatorPacket();
                 //sendpacket
                 //reset aggregation packet to default
+                packetReceivalTime=0.0;//set elapsed time back to 0
                 return;
             }
             PacketHelper.AggregatePacket(ref packet, ref aggregation);
+            packetReceivalTime = stopwatch.Elapsed.TotalSeconds;
         }
 
         //public static void InsertDocument(SimulatorPacket packet)

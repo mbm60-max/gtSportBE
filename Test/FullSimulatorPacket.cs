@@ -9,7 +9,7 @@ namespace FullSimulatorPacket{
         /// Date when this packet was received.
         /// </summary>
         public string DateReceived { get; set; }
-        public float distanceFromStart { get; set; }
+        public double distanceFromStart { get; set; }
         /// <summary>
         /// Game Type linked to this packet.
         /// </summary>

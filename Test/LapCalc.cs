@@ -1,3 +1,4 @@
+using System;
 namespace LapCalculations{
     internal static class LapCalc{
         internal static Boolean LapCompleted(ref short currentLap, ref short previousLap)
@@ -9,10 +10,9 @@ namespace LapCalculations{
             return false;
         }
 
-        internal static void RecordDistance(float MetersPerSecond, TimeSpan ElapsedTime)
+        internal static double RecordDistance(float MetersPerSecond, double ElapsedTime, double packetReceivalTime)
         {
-
-
+            return MetersPerSecond * (ElapsedTime-packetReceivalTime);
         }
     }
 }
