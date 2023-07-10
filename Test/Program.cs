@@ -27,11 +27,22 @@ using ServerMessages;
 using LapCalculations;
 using ServerHub;
 using FullSimulatorPacket;
+using PacketArrayHelpers;
+using MongoHelpers;
 
 namespace PDTools.SimulatorInterfaceTestTool
 {
+    
     internal class Program
-    {
+    {   
+        private static string username;
+
+        public static string Username
+        {
+            get { return username; }
+            set { username = value; }
+        }
+        
         private static bool _showUnknown = false;
         private static IMongoDatabase _database;
         private static string _collectionName;
@@ -39,15 +50,7 @@ namespace PDTools.SimulatorInterfaceTestTool
         private static IHost host;
         private static IHubContext<MyHub> hubContext;
         private static async Task Main(string[] args)
-        {
-
-            /* Mostly a test sample for using the Simulator Interface library */
-            //var connectionString = "mongodb+srv://maxbm:Kismetuni66@pdtoolcluster.een0p7c.mongodb.net/?retryWrites=true&w=majority";
-            //var client = new MongoClient(connectionString);
-            //_database = client.GetDatabase("Test");
-            //_collectionName = "Test Collection";
-            //_database.CreateCollection(_collectionName);
-
+        {   
             Console.WriteLine("Simulator Interface GT7/GTSport/GT6 - Nenkai#9075");
             Console.WriteLine();
 
@@ -86,8 +89,10 @@ namespace PDTools.SimulatorInterfaceTestTool
             // Get the hub context
             var serviceProvider = host.Services;
             hubContext = serviceProvider.GetRequiredService<IHubContext<MyHub>>();
+            ExtendedPacketArrays ExtendedPacketArrays = new ExtendedPacketArrays();
+            PacketArrayHelperClass packetArrayhelper = new PacketArrayHelperClass();
 
-
+            MongoDBHelper MongoHelper= new MongoDBHelper();
             Stopwatch stopWatch = null;
             Stopwatch lapTimeStopWatch = null;
             double inLapDistance = 0.0;
@@ -99,7 +104,7 @@ namespace PDTools.SimulatorInterfaceTestTool
             byte GearSelected = 0;
             SimulatorInterfaceClient simInterface = new SimulatorInterfaceClient(args[0], type);
             short previousLap = 0;
-            simInterface.OnReceive += (packet) => SimInterface_OnReceive(packet, ref throttleValue, hubContext, ref stopWatch, ref position,  ref inLapDistance, ref aggregation, ref packetCount, ref extendedPacket, ref previousLap, ref lapTimeStopWatch, ref inLapShifts, ref GearSelected,ref packetReceivalTime);
+            simInterface.OnReceive += (packet) => SimInterface_OnReceive(packet, ref throttleValue, hubContext, ref stopWatch, ref position,  ref inLapDistance, ref aggregation, ref packetCount, ref extendedPacket, ref previousLap, ref lapTimeStopWatch, ref inLapShifts, ref GearSelected,ref packetReceivalTime, ref ExtendedPacketArrays, ref packetArrayhelper, ref MongoHelper);
 
             var cts = new CancellationTokenSource();
 
@@ -131,21 +136,27 @@ namespace PDTools.SimulatorInterfaceTestTool
             }
         }
 
-        private delegate void SimInterfaceEventHandler(SimulatorPacket packet, byte throttleValue, IHubContext<MyHub> hubContext, ref Stopwatch stopwatch, ref Vector3 position,  ref double inLapDistance, ref SimulatorPacket aggregation, ref int packetCount,ref ExtendedPacket extendedPacket, ref short previousLap, ref Stopwatch lapTimeStopWatch,ref int inLapShifts, ref byte GearSelected, ref double packetReceivalTime);//, ref Stopwatch stopwatch
+        private delegate void SimInterfaceEventHandler(SimulatorPacket packet, byte throttleValue, IHubContext<MyHub> hubContext, ref Stopwatch stopwatch, ref Vector3 position,  ref double inLapDistance, ref SimulatorPacket aggregation, ref int packetCount,ref ExtendedPacket extendedPacket, ref short previousLap, ref Stopwatch lapTimeStopWatch,ref int inLapShifts, ref byte GearSelected, ref double packetReceivalTime, ref ExtendedPacketArrays ExtendedPacketArrays, ref PacketArrayHelperClass packetArrayhelper, ref MongoDBHelper MongoHelper);//, ref Stopwatch stopwatch
 
-        private static void SimInterface_OnReceive(SimulatorPacket packet, ref byte throttleValue, IHubContext<MyHub> hubContext, ref Stopwatch stopwatch, ref Vector3 position, ref double inLapDistance, ref SimulatorPacket aggregation, ref int packetCount,ref ExtendedPacket extendedPacket, ref short previousLap, ref Stopwatch lapTimeStopWatch, ref int inLapShifts, ref byte GearSelected, ref double packetReceivalTime)//, ref Stopwatch stopwatch
+        private static void SimInterface_OnReceive(SimulatorPacket packet, ref byte throttleValue, IHubContext<MyHub> hubContext, ref Stopwatch stopwatch, ref Vector3 position, ref double inLapDistance, ref SimulatorPacket aggregation, ref int packetCount,ref ExtendedPacket extendedPacket, ref short previousLap, ref Stopwatch lapTimeStopWatch, ref int inLapShifts, ref byte GearSelected, ref double packetReceivalTime, ref ExtendedPacketArrays ExtendedPacketArrays, ref PacketArrayHelperClass packetArrayhelper, ref MongoDBHelper MongoHelper)//, ref Stopwatch stopwatch
         {
+            //string username = hubContext.usernameResponse;
+            string username = Program.Username;
+            Boolean mongoReady = false;
+            if(username != null){
+               mongoReady = true;
+            }
+            Boolean IsNewLap = false;
             // Print the packet contents to the console
-            ///Console.SetCursorPosition(0, 0);
+            //Console.SetCursorPosition(0, 0);
             //packet.PrintPacket(_showUnknown);
-           // packet.PrintBasic(_showUnknown);
+            //packet.PrintBasic(_showUnknown);
             //byte x = packet.giveThrottle();
             short currentLap = packet.LapCount;
             if (packet.CurrentGear != GearSelected)
             {
                 bool currentGearIsLarger = packet.CurrentGear > GearSelected;
                 byte dif;
-    
                 if (currentGearIsLarger)
                 {
                      dif = (byte)(packet.CurrentGear - GearSelected);
@@ -170,6 +181,7 @@ namespace PDTools.SimulatorInterfaceTestTool
                 previousLap=currentLap;
                 inLapShifts=0;
                 lapTimeStopWatch=null;
+                IsNewLap = true;
             }
             if (lapTimeStopWatch == null)
             {
@@ -183,8 +195,9 @@ namespace PDTools.SimulatorInterfaceTestTool
                 inLapDistance = 0;
 
             }
-            inLapDistance += LapCalc.RecordDistance(packet.MetersPerSecond, stopwatch.Elapsed.TotalSeconds, packetReceivalTime);
-
+            if(stopwatch!=null){
+                            inLapDistance += LapCalc.RecordDistance(packet.MetersPerSecond, stopwatch.Elapsed.TotalSeconds, packetReceivalTime);
+            }
             if (stopwatch == null)
             {
                 PacketTimerClass.StartTimer(ref stopwatch);
@@ -236,26 +249,14 @@ namespace PDTools.SimulatorInterfaceTestTool
                 extendedPacket.distanceFromStart = inLapDistance;
                 extendedPacket.LapTiming=lapTimeStopWatch.Elapsed.TotalSeconds.ToString("0.########");;//convert to string
                 extendedPacket.InLapShifts=inLapShifts;
-                //Console.WriteLine(extendedPacket.DateReceived);
-               // Console.WriteLine(extendedPacket.RoadPlane[0]);
-                //Message.PositionMessage(extendedPacket.Position,hubContext);
-                //Message.StringMessage(extendedPacket.DateReceived,hubContext);
-                //Message.FloatMessage(extendedPacket.distanceFromStart,hubContext);
-                //Message.SimGameMessage(extendedPacket.GameType,hubContext);
-                //Message.IntMessage(extendedPacket.PacketId,hubContext);
-                //Message.ShortMessage(extendedPacket.LapCount,hubContext);
-                //Message.FlagsMessage(extendedPacket.Flags,hubContext);
-                //Message.FloatArrayMessage(extendedPacket.GearRatios,hubContext);
+                packetArrayhelper.ProcessExtendedPacket(extendedPacket, ExtendedPacketArrays, IsNewLap);
+                if(IsNewLap && mongoReady){
+                 MongoHelper.InsertExtendedPacket(username,ExtendedPacketArrays);
+                }
+                Message.PositionMessage(extendedPacket.Position,hubContext);
                 Message.FullPacketMessage(extendedPacket, hubContext);
-               // PropertyInfo[] properties2 = typeof(ExtendedPacket).GetProperties();
-               // foreach (PropertyInfo property in properties2)
-               // {
-                 //    Console.WriteLine($"{property.Name}: {property.GetValue(extendedPacket)}");
-               // }
-                // extendedPacket now contains the values from originalPacket
 
                 packetCount = 0;
-                //Message.PositionMessage(packet.Position,hubContext);//seems to not be working 
 
                 aggregation = new SimulatorPacket();
                 //sendpacket
@@ -266,12 +267,6 @@ namespace PDTools.SimulatorInterfaceTestTool
             PacketHelper.AggregatePacket(ref packet, ref aggregation);
             packetReceivalTime = stopwatch.Elapsed.TotalSeconds;
         }
-
-        //public static void InsertDocument(SimulatorPacket packet)
-        //{
-        //  var collection = _database.GetCollection<SimulatorPacket>(_collectionName);
-        //collection.InsertOne(packet);
-        //}
 
         private static IHostBuilder CreateHostBuilder(string[] args) =>
     Host.CreateDefaultBuilder(args)

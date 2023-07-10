@@ -15,6 +15,11 @@ SimulatorPacket result = RunAggregatePacketTest();
             {
                 Console.WriteLine($"{property.Name}: {property.GetValue(result2)}");
             }
+            
+
+
+
+
             public static SimulatorPacket RunAggregatePacketTest()
             {
         
@@ -145,3 +150,277 @@ SimulatorPacket result = RunAggregatePacketTest();
                 // Act
                 return PacketHelpers.AggregatePacket(ref packet, ref aggregation);
             }
+
+ExtendedPacket TestPacket  = new ExtendedPacket
+                {
+                    // Set the properties of the packet object here for testing
+                  
+                    DateReceived = "1:30",
+                    distanceFromStart = 1.0,
+                    Velocity = new string[] { "1.1", "1.2", "1.3" },
+                    Rotation =  new string[] { "1.1", "1.2", "1.3" },
+                    AngularVelocity =  new string[] { "1.1", "1.2", "1.3" },
+                    BodyHeight = 1.75f,
+                    EngineRPM = 6000.0f,
+                    GasLevel = 0.75f,
+                    GasCapacity = 60.0f,
+                    MetersPerSecond = 25.0f,
+                    TurboBoost = 1.8f,
+                    OilPressure = 4.2f,
+                    WaterTemperature = 80.0f,
+                    OilTemperature = 100.0f,
+                    TireFL_SurfaceTemperature = 32.5f,
+                    TireFR_SurfaceTemperature = 30.2f,
+                    TireRL_SurfaceTemperature = 33.8f,
+                    TireRR_SurfaceTemperature = 31.6f,
+                    PacketId = 123,
+                    LapCount = 5,
+                    LapsInRace = 10,
+                    BestLapTime =  "1:30",
+                    LastLapTime = "1:30",
+                    CalculatedMaxSpeed = 200,
+                    CurrentGear = 4,
+                    SuggestedGear = 3,
+                    Throttle = 80,
+                    Brake = 50,
+                    Empty_0x93 = 0,
+                    RoadPlane =  new string[] { "1.1", "1.2", "1.3" },
+                    RoadPlaneDistance = 10.0f,
+                    WheelFL_RevPerSecond = 20.5f,
+                    WheelFR_RevPerSecond = 21.0f,
+                    WheelRL_RevPerSecond = 20.2f,
+                    WheelRR_RevPerSecond = 20.8f,
+                    TireFL_TireRadius = 0.3f,
+                    TireFR_TireRadius = 0.3f,
+                    TireRL_TireRadius = 0.3f,
+                    TireRR_TireRadius = 0.3f,
+                    TireFL_SusHeight = 0.2f,
+                    TireFR_SusHeight = 0.2f,
+                    TireRL_SusHeight = 0.2f,
+                    TireRR_SusHeight = 0.2f,
+                    ClutchPedal = 0.8f,
+                    ClutchEngagement = 0.9f,
+                    RPMFromClutchToGearbox = 5500.0f,
+                    TransmissionTopSpeed = 250.0f,
+                };
+                ExtendedPacket TestPacket2  = new ExtendedPacket
+                {
+                    // Set the properties of the packet object here for testing
+                  
+                    DateReceived = "1:30",
+                    distanceFromStart = 1.0,
+                    Velocity = new string[] { "1.1", "1.2", "1.3" },
+                    Rotation =  new string[] { "1.1", "1.2", "1.3" },
+                    AngularVelocity =  new string[] { "1.1", "1.2", "1.3" },
+                    BodyHeight = 1.75f,
+                    EngineRPM = 6000.0f,
+                    GasLevel = 0.75f,
+                    GasCapacity = 60.0f,
+                    MetersPerSecond = 25.0f,
+                    TurboBoost = 1.8f,
+                    OilPressure = 4.2f,
+                    WaterTemperature = 80.0f,
+                    OilTemperature = 100.0f,
+                    TireFL_SurfaceTemperature = 32.5f,
+                    TireFR_SurfaceTemperature = 30.2f,
+                    TireRL_SurfaceTemperature = 33.8f,
+                    TireRR_SurfaceTemperature = 31.6f,
+                    PacketId = 123,
+                    LapCount = 5,
+                    LapsInRace = 10,
+                    BestLapTime =  "1:30",
+                    LastLapTime = "1:30",
+                    CalculatedMaxSpeed = 200,
+                    CurrentGear = 4,
+                    SuggestedGear = 3,
+                    Throttle = 80,
+                    Brake = 50,
+                    Empty_0x93 = 0,
+                    RoadPlane =  new string[] { "1.1", "1.2", "1.3" },
+                    RoadPlaneDistance = 10.0f,
+                    WheelFL_RevPerSecond = 20.5f,
+                    WheelFR_RevPerSecond = 21.0f,
+                    WheelRL_RevPerSecond = 20.2f,
+                    WheelRR_RevPerSecond = 20.8f,
+                    TireFL_TireRadius = 0.3f,
+                    TireFR_TireRadius = 0.3f,
+                    TireRL_TireRadius = 0.3f,
+                    TireRR_TireRadius = 0.3f,
+                    TireFL_SusHeight = 0.2f,
+                    TireFR_SusHeight = 0.2f,
+                    TireRL_SusHeight = 0.2f,
+                    TireRR_SusHeight = 0.2f,
+                    ClutchPedal = 0.8f,
+                    ClutchEngagement = 0.9f,
+                    RPMFromClutchToGearbox = 5500.0f,
+                    TransmissionTopSpeed = 250.0f,
+                };
+            ExtendedPacketArrays TestPacketArrays = new ExtendedPacketArrays();
+            PacketArrayHelperClass helper = new PacketArrayHelperClass();
+            helper.ProcessExtendedPacket(TestPacket, TestPacketArrays, false);
+            helper.ProcessExtendedPacket(TestPacket2, TestPacketArrays, false);
+            //Console.WriteLine(TestPacketArrays.BestLapTime[0]);
+            PropertyInfo[] properties3 = typeof(ExtendedPacketArrays).GetProperties();
+
+            foreach (PropertyInfo property in properties3)
+            {
+                if (property.PropertyType.IsArray)
+                {
+                    Array array = (Array)property.GetValue(TestPacketArrays);
+                    if (array != null && array.Length > 0)
+                    {
+                        Type elementType = array.GetType().GetElementType();
+                        if (elementType == typeof(string[]))
+    {
+        // Jagged array of string[]
+        for (int i = 0; i < array.Length; i++)
+        {
+            
+            string[] innerArray = (string[])array.GetValue(i);
+            for (int j = 0; j < innerArray.Length; j++)
+        {   
+            Console.WriteLine($"{property.Name}[{i}]: {innerArray[j]}");
+        }
+        }
+    }
+                        else
+                        {
+                            for (int i = 0; i < array.Length; i++)
+                            {                   
+                            object firstValue = array.GetValue(i);
+                            Console.WriteLine($"{property.Name}[0]: {firstValue}");
+                            }
+                        }
+                    }
+                }else{
+                    object propertyValue = property.GetValue(TestPacketArrays);
+                    Console.WriteLine($"{property.Name}: {propertyValue}");
+                }
+            }
+
+
+
+
+
+            ExtendedPacket TestPacket  = new ExtendedPacket
+                {
+                    // Set the properties of the packet object here for testing
+                  
+                    DateReceived = "1:30",
+                    distanceFromStart = 1.0,
+                    Velocity = new string[] { "1.1", "1.2", "1.3" },
+                    Rotation =  new string[] { "1.1", "1.2", "1.3" },
+                    AngularVelocity =  new string[] { "1.1", "1.2", "1.3" },
+                    BodyHeight = 1.75f,
+                    EngineRPM = 6000.0f,
+                    GasLevel = 0.75f,
+                    GasCapacity = 60.0f,
+                    MetersPerSecond = 25.0f,
+                    TurboBoost = 1.8f,
+                    OilPressure = 4.2f,
+                    WaterTemperature = 80.0f,
+                    OilTemperature = 100.0f,
+                    TireFL_SurfaceTemperature = 32.5f,
+                    TireFR_SurfaceTemperature = 30.2f,
+                    TireRL_SurfaceTemperature = 33.8f,
+                    TireRR_SurfaceTemperature = 31.6f,
+                    PacketId = 123,
+                    LapCount = 5,
+                    LapsInRace = 10,
+                    BestLapTime =  "1:30",
+                    LastLapTime = "1:30",
+                    CalculatedMaxSpeed = 200,
+                    CurrentGear = 4,
+                    SuggestedGear = 3,
+                    Throttle = 80,
+                    Brake = 50,
+                    Empty_0x93 = 0,
+                    RoadPlane =  new string[] { "1.1", "1.2", "1.3" },
+                    RoadPlaneDistance = 10.0f,
+                    WheelFL_RevPerSecond = 20.5f,
+                    WheelFR_RevPerSecond = 21.0f,
+                    WheelRL_RevPerSecond = 20.2f,
+                    WheelRR_RevPerSecond = 20.8f,
+                    TireFL_TireRadius = 0.3f,
+                    TireFR_TireRadius = 0.3f,
+                    TireRL_TireRadius = 0.3f,
+                    TireRR_TireRadius = 0.3f,
+                    TireFL_SusHeight = 0.2f,
+                    TireFR_SusHeight = 0.2f,
+                    TireRL_SusHeight = 0.2f,
+                    TireRR_SusHeight = 0.2f,
+                    ClutchPedal = 0.8f,
+                    ClutchEngagement = 0.9f,
+                    RPMFromClutchToGearbox = 5500.0f,
+                    TransmissionTopSpeed = 250.0f,
+                    LapTiming =  "1:30",
+                };
+                ExtendedPacket TestPacket2  = new ExtendedPacket
+                {
+                    // Set the properties of the packet object here for testing
+                  
+                    DateReceived = "1:30",
+                    distanceFromStart = 1.0,
+                    Velocity = new string[] { "1.1", "1.2", "1.3" },
+                    Rotation =  new string[] { "1.1", "1.2", "1.3" },
+                    AngularVelocity =  new string[] { "1.1", "1.2", "1.3" },
+                    BodyHeight = 1.75f,
+                    EngineRPM = 6000.0f,
+                    GasLevel = 0.75f,
+                    GasCapacity = 60.0f,
+                    MetersPerSecond = 25.0f,
+                    TurboBoost = 1.8f,
+                    OilPressure = 4.2f,
+                    WaterTemperature = 80.0f,
+                    OilTemperature = 100.0f,
+                    TireFL_SurfaceTemperature = 32.5f,
+                    TireFR_SurfaceTemperature = 30.2f,
+                    TireRL_SurfaceTemperature = 33.8f,
+                    TireRR_SurfaceTemperature = 31.6f,
+                    PacketId = 123,
+                    LapCount = 5,
+                    LapsInRace = 10,
+                    BestLapTime =  "1:30",
+                    LastLapTime = "1:30",
+                    CalculatedMaxSpeed = 200,
+                    CurrentGear = 4,
+                    SuggestedGear = 3,
+                    Throttle = 80,
+                    Brake = 50,
+                    Empty_0x93 = 0,
+                    RoadPlane =  new string[] { "1.1", "1.2", "1.3" },
+                    RoadPlaneDistance = 10.0f,
+                    WheelFL_RevPerSecond = 20.5f,
+                    WheelFR_RevPerSecond = 21.0f,
+                    WheelRL_RevPerSecond = 20.2f,
+                    WheelRR_RevPerSecond = 20.8f,
+                    TireFL_TireRadius = 0.3f,
+                    TireFR_TireRadius = 0.3f,
+                    TireRL_TireRadius = 0.3f,
+                    TireRR_TireRadius = 0.3f,
+                    TireFL_SusHeight = 0.2f,
+                    TireFR_SusHeight = 0.2f,
+                    TireRL_SusHeight = 0.2f,
+                    TireRR_SusHeight = 0.2f,
+                    ClutchPedal = 0.8f,
+                    ClutchEngagement = 0.9f,
+                    RPMFromClutchToGearbox = 5500.0f,
+                    TransmissionTopSpeed = 250.0f,
+                    LapTiming =  "1:30",
+                };
+            ExtendedPacketArrays TestPacketArrays = new ExtendedPacketArrays();
+            PacketArrayHelperClass helper = new PacketArrayHelperClass();
+            helper.ProcessExtendedPacket(TestPacket, TestPacketArrays, false);
+            helper.ProcessExtendedPacket(TestPacket2, TestPacketArrays, false);
+            MongoDBHelper TestMongoHelper= new MongoDBHelper();
+            string Testusername = Program.Username;
+            while(Testusername == null){
+               Testusername = Program.Username;
+                if (Testusername == null)
+                {
+                    Console.WriteLine("waiting");
+                    Thread.Sleep(100000);
+                }
+            }
+            Console.WriteLine(Testusername);
+            TestMongoHelper.InsertExtendedPacket(Testusername,TestPacketArrays);

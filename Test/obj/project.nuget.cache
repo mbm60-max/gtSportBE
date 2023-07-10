@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "XUMZ/nsb+TDUom6cUbG7CKyrDuUHQANonPwlUwkspsioaldulYmy7SGHJzsped9QZMDMa6Rmk6KbAtio8G1zFQ==",
+  "dgSpecHash": "a9JMlUCrZ3GstRhjbpEha5jyEgmpA3zMjsFACfvAKxPlV26yyNOnQB+u45AkspBHyuOVxNaRnm8yUHNP7uUXcA==",
   "success": true,
   "projectFilePath": "/Users/maxbyng-maddick/Documents/Code/PersonalCode/gtSportBE/Test/Test.csproj",
   "expectedPackageFiles": [
@@ -59,10 +59,10 @@
     "/Users/maxbyng-maddick/.nuget/packages/microsoft.netcore.targets/1.1.0/microsoft.netcore.targets.1.1.0.nupkg.sha512",
     "/Users/maxbyng-maddick/.nuget/packages/microsoft.win32.primitives/4.3.0/microsoft.win32.primitives.4.3.0.nupkg.sha512",
     "/Users/maxbyng-maddick/.nuget/packages/microsoft.win32.registry/5.0.0/microsoft.win32.registry.5.0.0.nupkg.sha512",
-    "/Users/maxbyng-maddick/.nuget/packages/mongodb.bson/2.19.2/mongodb.bson.2.19.2.nupkg.sha512",
-    "/Users/maxbyng-maddick/.nuget/packages/mongodb.driver/2.19.2/mongodb.driver.2.19.2.nupkg.sha512",
-    "/Users/maxbyng-maddick/.nuget/packages/mongodb.driver.core/2.19.2/mongodb.driver.core.2.19.2.nupkg.sha512",
-    "/Users/maxbyng-maddick/.nuget/packages/mongodb.libmongocrypt/1.7.0/mongodb.libmongocrypt.1.7.0.nupkg.sha512",
+    "/Users/maxbyng-maddick/.nuget/packages/mongodb.bson/2.20.0/mongodb.bson.2.20.0.nupkg.sha512",
+    "/Users/maxbyng-maddick/.nuget/packages/mongodb.driver/2.20.0/mongodb.driver.2.20.0.nupkg.sha512",
+    "/Users/maxbyng-maddick/.nuget/packages/mongodb.driver.core/2.20.0/mongodb.driver.core.2.20.0.nupkg.sha512",
+    "/Users/maxbyng-maddick/.nuget/packages/mongodb.libmongocrypt/1.8.0/mongodb.libmongocrypt.1.8.0.nupkg.sha512",
     "/Users/maxbyng-maddick/.nuget/packages/netstandard.library/1.6.1/netstandard.library.1.6.1.nupkg.sha512",
     "/Users/maxbyng-maddick/.nuget/packages/newtonsoft.json/11.0.2/newtonsoft.json.11.0.2.nupkg.sha512",
     "/Users/maxbyng-maddick/.nuget/packages/runtime.debian.8-x64.runtime.native.system.security.cryptography.openssl/4.3.0/runtime.debian.8-x64.runtime.native.system.security.cryptography.openssl.4.3.0.nupkg.sha512",
