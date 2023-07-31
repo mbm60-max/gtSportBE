@@ -29,7 +29,7 @@ using ServerHub;
 using FullSimulatorPacket;
 using PacketArrayHelpers;
 using MongoHelpers;
-
+using FileUtils;
 namespace PDTools.SimulatorInterfaceTestTool
 {
     
@@ -42,15 +42,74 @@ namespace PDTools.SimulatorInterfaceTestTool
             get { return username; }
             set { username = value; }
         }
-        
+
         private static bool _showUnknown = false;
         private static IMongoDatabase _database;
         private static string _collectionName;
 
         private static IHost host;
         private static IHubContext<MyHub> hubContext;
-        private static async Task Main(string[] args)
+        
+        private static async Task Main(string[]args)
         {   
+int initialDelayMilliseconds = 1000; // Initial delay in milliseconds
+        int maxAttempts = 1000; // Maximum number of attempts
+
+        string[] argArray;
+        int attempt = 1;
+          do
+        {
+            Console.WriteLine("running");
+            argArray = await DataHelper.ReadDataFromFile("data.txt");
+
+            if (argArray.Length == 0 || argArray[0] == "")
+            {
+                // Exponential backoff
+                int currentDelay = initialDelayMilliseconds * (int)Math.Pow(2, attempt - 1);
+                await Task.Delay(currentDelay);
+                attempt++;
+
+                if (attempt > maxAttempts)
+                {
+                    Console.WriteLine("Maximum number of attempts reached. Exiting.");
+                    return;
+                }
+            }
+        }
+        while (argArray.Length == 0 || argArray[0] == "");
+
+        foreach (string value in argArray)
+        {
+            Console.WriteLine(value);
+        }
+    
+            byte throttleValue = 0;
+            Vector3 position = new Vector3(0, 0, 0);
+            // Build the host
+            host = CreateHostBuilder().Build();
+
+            // Start the host in the background
+            _ = host.RunAsync();
+
+            // Get the hub context
+            var serviceProvider = host.Services;
+
+            hubContext = serviceProvider.GetRequiredService<IHubContext<MyHub>>();
+          
+            ExtendedPacketArrays ExtendedPacketArrays = new ExtendedPacketArrays();
+            PacketArrayHelperClass packetArrayhelper = new PacketArrayHelperClass();
+
+            MongoDBHelper MongoHelper= new MongoDBHelper();
+            Stopwatch stopWatch = null;
+            Stopwatch lapTimeStopWatch = null;
+            double inLapDistance = 0.0;
+            SimulatorPacket aggregation = new SimulatorPacket { };
+            ExtendedPacket extendedPacket = new ExtendedPacket();
+            int packetCount = 0;
+            int inLapShifts = 0;
+            double packetReceivalTime = 0.0;
+            byte GearSelected = 0;
+            
             Console.WriteLine("Simulator Interface GT7/GTSport/GT6 - Nenkai#9075");
             Console.WriteLine();
 
@@ -72,36 +131,15 @@ namespace PDTools.SimulatorInterfaceTestTool
 
             Console.WriteLine("Starting interface..");
 
+            // Use the data received from the hub
+          
             SimulatorInterfaceGameType type = SimulatorInterfaceGameType.GT7;
             if (gtsport)
                 type = SimulatorInterfaceGameType.GTSport;
             else if (gt6)
                 type = SimulatorInterfaceGameType.GT6;
 
-            byte throttleValue = 0;
-            Vector3 position = new Vector3(0, 0, 0);
-            // Build the host
-            host = CreateHostBuilder(args).Build();
 
-            // Start the host in the background
-            _ = host.RunAsync();
-
-            // Get the hub context
-            var serviceProvider = host.Services;
-            hubContext = serviceProvider.GetRequiredService<IHubContext<MyHub>>();
-            ExtendedPacketArrays ExtendedPacketArrays = new ExtendedPacketArrays();
-            PacketArrayHelperClass packetArrayhelper = new PacketArrayHelperClass();
-
-            MongoDBHelper MongoHelper= new MongoDBHelper();
-            Stopwatch stopWatch = null;
-            Stopwatch lapTimeStopWatch = null;
-            double inLapDistance = 0.0;
-            SimulatorPacket aggregation = new SimulatorPacket { };
-            ExtendedPacket extendedPacket = new ExtendedPacket();
-            int packetCount = 0;
-            int inLapShifts = 0;
-            double packetReceivalTime = 0.0;
-            byte GearSelected = 0;
             SimulatorInterfaceClient simInterface = new SimulatorInterfaceClient(args[0], type);
             short previousLap = 0;
             simInterface.OnReceive += (packet) => SimInterface_OnReceive(packet, ref throttleValue, hubContext, ref stopWatch, ref position,  ref inLapDistance, ref aggregation, ref packetCount, ref extendedPacket, ref previousLap, ref lapTimeStopWatch, ref inLapShifts, ref GearSelected,ref packetReceivalTime, ref ExtendedPacketArrays, ref packetArrayhelper, ref MongoHelper);
@@ -268,8 +306,8 @@ namespace PDTools.SimulatorInterfaceTestTool
             packetReceivalTime = stopwatch.Elapsed.TotalSeconds;
         }
 
-        private static IHostBuilder CreateHostBuilder(string[] args) =>
-    Host.CreateDefaultBuilder(args)
+        private static IHostBuilder CreateHostBuilder() =>
+    Host.CreateDefaultBuilder()
         .ConfigureWebHostDefaults(webBuilder =>
         {
             webBuilder.ConfigureServices(services =>
