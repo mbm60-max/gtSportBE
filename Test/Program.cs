@@ -50,39 +50,39 @@ namespace PDTools.SimulatorInterfaceTestTool
         private static IHost host;
         private static IHubContext<MyHub> hubContext;
         
-        private static async Task Main(string[]args)
+        private static async Task Main()
         {   
-int initialDelayMilliseconds = 1000; // Initial delay in milliseconds
-        int maxAttempts = 1000; // Maximum number of attempts
+//int initialDelayMilliseconds = 1000; // Initial delay in milliseconds
+     //   int maxAttempts = 1000; // Maximum number of attempts
 
-        string[] argArray;
-        int attempt = 1;
-          do
-        {
-            Console.WriteLine("running");
-            argArray = await DataHelper.ReadDataFromFile("data.txt");
+     //  List<string> argArray;
+      //  int attempt = 1;
+       //   do
+       // {
+         //   Console.WriteLine("running");
+         //   argArray = await DataHelper.ReadDataFromFile("data.txt");
 
-            if (argArray.Length == 0 || argArray[0] == "")
-            {
+          // if (argArray.Count == 0 || argArray[0] == "")
+          //  {
                 // Exponential backoff
-                int currentDelay = initialDelayMilliseconds * (int)Math.Pow(2, attempt - 1);
-                await Task.Delay(currentDelay);
-                attempt++;
+             //   int currentDelay = initialDelayMilliseconds * (int)Math.Pow(2, attempt - 1);
+              //  await Task.Delay(currentDelay);
+              //  attempt++;
+//
+             //   if (attempt > maxAttempts)
+              //  {
+                //    Console.WriteLine("Maximum number of attempts reached. Exiting.");
+                //    return;
+              //  }
+           // }
+       // }
+        //while (argArray.Count == 0);
 
-                if (attempt > maxAttempts)
-                {
-                    Console.WriteLine("Maximum number of attempts reached. Exiting.");
-                    return;
-                }
-            }
-        }
-        while (argArray.Length == 0 || argArray[0] == "");
-
-        foreach (string value in argArray)
-        {
-            Console.WriteLine(value);
-        }
-    
+        //foreach (string value in argArray)
+        //{
+        //     Console.WriteLine(argArray.Count);
+        //}
+    string[]args= {"212.132.163.178","--gt","sport"};
             byte throttleValue = 0;
             Vector3 position = new Vector3(0, 0, 0);
             // Build the host
