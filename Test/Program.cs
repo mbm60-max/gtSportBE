@@ -30,6 +30,7 @@ using FullSimulatorPacket;
 using PacketArrayHelpers;
 using MongoHelpers;
 using FileUtils;
+using YouTubeHandlers;
 namespace PDTools.SimulatorInterfaceTestTool
 {
     
@@ -81,6 +82,8 @@ namespace PDTools.SimulatorInterfaceTestTool
         //foreach (string value in argArray)
         //{
         //     Console.WriteLine(argArray.Count);
+
+        
         //}
     string[]args= {"212.132.163.178","--gt","sport"};
             byte throttleValue = 0;
@@ -130,7 +133,9 @@ namespace PDTools.SimulatorInterfaceTestTool
             }
 
             Console.WriteLine("Starting interface..");
-
+YouTubeHandler YouTubeHandler= new YouTubeHandler();
+        YouTubeHandler.SearchAndUploadVideos();
+         Console.WriteLine("hehe");
             // Use the data received from the hub
           
             SimulatorInterfaceGameType type = SimulatorInterfaceGameType.GT7;
@@ -289,7 +294,7 @@ namespace PDTools.SimulatorInterfaceTestTool
                 extendedPacket.InLapShifts=inLapShifts;
                 packetArrayhelper.ProcessExtendedPacket(extendedPacket, ExtendedPacketArrays, IsNewLap);
                 if(IsNewLap && mongoReady){
-                 MongoHelper.InsertExtendedPacket(username,ExtendedPacketArrays);
+                 MongoHelper.InsertExtendedPacket(username,ExtendedPacketArrays,"UserSessions");
                 }
                 Message.PositionMessage(extendedPacket.Position,hubContext);
                 Message.FullPacketMessage(extendedPacket, hubContext);
