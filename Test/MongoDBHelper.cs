@@ -4,10 +4,12 @@ using MongoDB.Driver;
 using FullSimulatorPacket;
 using PacketArrayHelpers;
 using YouTubeHelpers;
+using ChallengeHelpers;
 namespace  MongoHelpers{
 internal class MongoDBHelper
 {
     private YouTubeHelper youTubeHelper = new YouTubeHelper();
+    private ChallengeHelper challengeHelper = new ChallengeHelper();
     private  IMongoDatabase _database;
     private void InitializeMongoDB(string databaseName)
     {
@@ -105,17 +107,54 @@ internal class MongoDBHelper
     {
         _database.CreateCollection(collectionName);
     }
+       collection.InsertOne(sessionDocument);
+        }
 
+public void InsertChallenges(string collectionName, List<ChallengeHelpers.ChallengeHelper.ChallengeData> challengeData,string databaseName)
+        {
+
+
+            InitializeMongoDB(databaseName);
+
+    // Check if the collection exists
+    var collectionExists = CollectionExists(collectionName);
+
+    var collection = _database.GetCollection<BsonDocument>(collectionName);
+
+            var challengeArray = new BsonArray();
+
+    foreach (var data in challengeData)
+    {
+        var videoDocument = new BsonDocument
+        {
+            { "Track", data.Track },
+            { "Car", data.Car },
+            { "Target", data.Target },//number of laps challenge value eg time,%, laps must be met
+        };
+
+        challengeArray.Add(videoDocument);
+    }
+
+    var sessionDocument = new BsonDocument
+    {
+        { "Type", "Challenge" },
+        { "ChallengeData", challengeArray }
+    };
+
+    if (!collectionExists)
+    {
+        _database.CreateCollection(collectionName);
+    }
     collection.InsertOne(sessionDocument);
         }
 
 
 
 
-            public string GetLastUpdatedDate(string databaseName)
+
+            public string GetLastUpdatedDate(string databaseName, string collectionName)
     {
         InitializeMongoDB(databaseName);
-        var collectionName = "LastUpdatedVideo"; // Collection name
         var collection = _database.GetCollection<BsonDocument>(collectionName);
 
 

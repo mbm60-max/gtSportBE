@@ -31,6 +31,7 @@ using PacketArrayHelpers;
 using MongoHelpers;
 using FileUtils;
 using YouTubeHandlers;
+using ChallengeHandlers;
 namespace PDTools.SimulatorInterfaceTestTool
 {
     
@@ -135,6 +136,9 @@ namespace PDTools.SimulatorInterfaceTestTool
             Console.WriteLine("Starting interface..");
 YouTubeHandler YouTubeHandler= new YouTubeHandler();
         YouTubeHandler.SearchAndUploadVideos();
+                   
+ChallengeHandler ChallengeHandler= new ChallengeHandler();
+        ChallengeHandler.UploadChallenges();
          Console.WriteLine("hehe");
             // Use the data received from the hub
           
