@@ -941,7 +941,7 @@ new Track {
                 string track = trackList[valueToGrabTrack].title;
                 string carBrand = carList[valueToGrabCar].brand;
                 string carName  = carList[valueToGrabCar].name;
-                string fullName = carBrand + carName;
+                string fullName = carBrand + " " + carName;
                         challengeData.Add(new ChallengeData
                          {
                             Track = track,
