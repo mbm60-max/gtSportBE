@@ -52,7 +52,7 @@ namespace PDTools.SimulatorInterfaceTestTool
         private static IHost host;
         private static IHubContext<MyHub> hubContext;
         
-        private static async Task Main()
+        private static async Task Main(string[]args)
         {   
 //int initialDelayMilliseconds = 1000; // Initial delay in milliseconds
      //   int maxAttempts = 1000; // Maximum number of attempts
@@ -83,10 +83,12 @@ namespace PDTools.SimulatorInterfaceTestTool
         //foreach (string value in argArray)
         //{
         //     Console.WriteLine(argArray.Count);
-
-        
+// to test 
+// 192.168.1.200, 255.255.255.0, 192.168.1.1, 212.132.163.178
+        //tested
+        //
         //}
-    string[]args= {"212.132.163.178","--gt","sport"};
+    //string[]args= {"212.132.163.178","--gt","sport"};// was for ps4 "212.132.163.178"
             byte throttleValue = 0;
             Vector3 position = new Vector3(0, 0, 0);
             // Build the host
@@ -188,7 +190,7 @@ ChallengeHandler ChallengeHandler= new ChallengeHandler();
         private static void SimInterface_OnReceive(SimulatorPacket packet, ref byte throttleValue, IHubContext<MyHub> hubContext, ref Stopwatch stopwatch, ref Vector3 position, ref double inLapDistance, ref SimulatorPacket aggregation, ref int packetCount,ref ExtendedPacket extendedPacket, ref short previousLap, ref Stopwatch lapTimeStopWatch, ref int inLapShifts, ref byte GearSelected, ref double packetReceivalTime, ref ExtendedPacketArrays ExtendedPacketArrays, ref PacketArrayHelperClass packetArrayhelper, ref MongoDBHelper MongoHelper)//, ref Stopwatch stopwatch
         {
             //string username = hubContext.usernameResponse;
-            string username = Program.Username;
+            string username = "5";
             Boolean mongoReady = false;
             if(username != null){
                mongoReady = true;
@@ -212,7 +214,7 @@ ChallengeHandler ChallengeHandler= new ChallengeHandler();
                 {
                      dif = (byte)(GearSelected - packet.CurrentGear);
                 }
-
+                GearSelected = packet.CurrentGear;
                 inLapShifts += dif;
             }
 
@@ -226,7 +228,6 @@ ChallengeHandler ChallengeHandler= new ChallengeHandler();
             }
             if(currentLap>previousLap){
                 previousLap=currentLap;
-                inLapShifts=0;
                 lapTimeStopWatch=null;
                 IsNewLap = true;
             }
@@ -300,7 +301,7 @@ ChallengeHandler ChallengeHandler= new ChallengeHandler();
                 if(IsNewLap && mongoReady){
                  MongoHelper.InsertExtendedPacket(username,ExtendedPacketArrays,"UserSessions");
                 }
-                Message.PositionMessage(extendedPacket.Position,hubContext);
+                //Message.PositionMessage(extendedPacket.Position,hubContext);
                 Message.FullPacketMessage(extendedPacket, hubContext);
 
                 packetCount = 0;
@@ -311,6 +312,14 @@ ChallengeHandler ChallengeHandler= new ChallengeHandler();
                 packetReceivalTime=0.0;//set elapsed time back to 0
                 return;
             }
+            if(IsNewLap){
+                inLapShifts=0;
+            }
+            if(IsNewLap && mongoReady){
+                if(currentLap>1){
+                MongoHelper.InsertExtendedPacket(username,ExtendedPacketArrays,"UserSessions");
+                }
+                }
             PacketHelper.AggregatePacket(ref packet, ref aggregation);
             packetReceivalTime = stopwatch.Elapsed.TotalSeconds;
         }

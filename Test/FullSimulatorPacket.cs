@@ -78,7 +78,7 @@ namespace FullSimulatorPacket{
         public float OilPressure { get; set; }
 
         /// <summary>
-        /// Games will always send 85.
+        /// Games will always send 85
         /// </summary>
         public float WaterTemperature { get; set; }
 

@@ -5,6 +5,7 @@ namespace LapCalculations{
         {
             if ((currentLap > 0) && (currentLap > previousLap))
             {
+                Console.WriteLine("test");
                 return true;
             }
             return false;
