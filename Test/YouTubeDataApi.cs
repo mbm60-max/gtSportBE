@@ -18,33 +18,35 @@ internal class YouTubeHelper
         try
         {
             List<VideoData> videoData = new List<VideoData>();
+            HashSet<string> uniqueVideoIds = new HashSet<string>();
             int totalResults = 0;
             int resultsPerPage = 10; // Default results per page
 
             // Calculate the number of pages required based on maxResults
-            int totalPages = (int)Math.Ceiling((double)maxResults / resultsPerPage);
-
+            int totalPages =  (int)Math.Ceiling((double)maxResults / resultsPerPage);
             for (int page = 1; page <= totalPages; page++)
             {
                 // Make a request to search for videos for each page
                 HttpResponseMessage response = await client.GetAsync($"{baseURL}/search?key={apiKey}&q={searchQuery}&part=snippet&type=video&order=viewCount&maxResults={resultsPerPage}&videoLanguage=en&pageToken={(page == 1 ? "" : nextPageToken)}");
-
                 if (response.IsSuccessStatusCode)
                 {
                     // Parse the JSON response
                     string responseBody = await response.Content.ReadAsStringAsync();
                     var result = Newtonsoft.Json.JsonConvert.DeserializeObject<YouTubeSearchResult>(responseBody);
-
                     // Extract video URLs, titles, video creators, and durations
                     foreach (var item in result.items)
                     {
-                        videoData.Add(new VideoData
+                         if (!uniqueVideoIds.Contains(item.id.videoId))
                         {
-                            VideoId = item.id.videoId,
-                            Title = item.snippet.title,
-                            Creator = item.snippet.channelTitle,
-                            Duration = item.snippet.liveBroadcastContent
-                        });
+                            uniqueVideoIds.Add(item.id.videoId);
+                            videoData.Add(new VideoData
+                            {
+                                VideoId = item.id.videoId,
+                                Title = item.snippet.title,
+                                Creator = item.snippet.channelTitle,
+                                Duration = item.snippet.liveBroadcastContent
+                            });
+                        }
                     }
 
                     totalResults += result.pageInfo.resultsPerPage;

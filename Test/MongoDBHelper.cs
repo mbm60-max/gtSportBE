@@ -107,7 +107,10 @@ internal class MongoDBHelper
     {
         _database.CreateCollection(collectionName);
     }
-       collection.InsertOne(sessionDocument);
+          var filter = Builders<BsonDocument>.Filter.Empty;
+    var replaceOptions = new ReplaceOptions { IsUpsert = true }; // Upsert if document doesn't exist
+
+    collection.ReplaceOne(filter, sessionDocument, replaceOptions);
         }
 
 public void InsertChallenges(string collectionName, List<ChallengeHelpers.ChallengeHelper.ChallengeData> challengeData,string databaseName)
@@ -129,7 +132,8 @@ public void InsertChallenges(string collectionName, List<ChallengeHelpers.Challe
         {
             { "Track", data.Track },
             { "Car", data.Car },
-            { "Target", data.Target },//number of laps challenge value eg time,%, laps must be met
+            { "Target", data.Target },
+             {"IsCompleted",false},//number of laps challenge value eg time,%, laps must be met
         };
 
         challengeArray.Add(videoDocument);
@@ -145,7 +149,10 @@ public void InsertChallenges(string collectionName, List<ChallengeHelpers.Challe
     {
         _database.CreateCollection(collectionName);
     }
-    collection.InsertOne(sessionDocument);
+      var filter = Builders<BsonDocument>.Filter.Empty;
+    var replaceOptions = new ReplaceOptions { IsUpsert = true }; // Upsert if document doesn't exist
+
+    collection.ReplaceOne(filter, sessionDocument, replaceOptions);
         }
 
 
