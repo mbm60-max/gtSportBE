@@ -15,8 +15,8 @@ internal class ChallengeHelper
    
             List<ChallengeData> challengeData = new List<ChallengeData>();
             List<string> challengeTypes = new List<string>{"Consistency","Pace","Endurance"};
-            List<int> upperBound = new List<int> {5,2,10};
-            List<int> lowerBound = new List<int> {2,1,5};
+            List<int> upperBound = new List<int> {5,200,10};
+            List<int> lowerBound = new List<int> {2,110,5};
      
             List<Car> carList = new List<Car>{
               new Car { id= 1, brand= "Abarth", name= "1500 Biposto Bertone B.A.T 1", category= "N 100" },
