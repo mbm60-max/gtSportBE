@@ -22,6 +22,11 @@ internal class ChallengeHandler
             MongoDBHelper MongoHelper= new MongoDBHelper();
             string lastUpdatedDate = MongoHelper.GetLastUpdatedDate(databaseName,collectionName);
             if(lastUpdatedDate != gmtDate){
+            string userDatabseName = "Test";
+            string userCollectionnName = "Users";
+            //reset all users completion status for the new day
+            MongoHelper.UpdateCompletedChallenges(userDatabseName,userCollectionnName);
+
                 //update the values
                  ChallengeHelper challengeHelper = new ChallengeHelper();
                  List<ChallengeHelpers.ChallengeHelper.ChallengeData> challengeData = challengeHelper.GenerateChallenges();

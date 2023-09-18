@@ -201,6 +201,26 @@ public void InsertChallenges(string collectionName, List<ChallengeHelpers.Challe
         // Update the document without retrieving it
         collection.UpdateOne(filter, update, new UpdateOptions { IsUpsert = true });
     }
+    public void UpdateCompletedChallenges(string databaseName, string collectionName)
+    {
+        InitializeMongoDB(databaseName);
+        var collection = _database.GetCollection<BsonDocument>(collectionName);
+
+        // Create a filter to find documents with completedChallengeArray
+        var filter = Builders<BsonDocument>.Filter.Exists("completedChallenges");
+
+        // Create an update definition to set completedChallengeArray to [false, false, false]
+        var update = Builders<BsonDocument>.Update.Set("completedChallenges", new BsonArray(new[] { false, false, false }));
+
+        // Update all documents matching the filter
+        var updateResult = collection.UpdateMany(filter, update);
+
+        // Check the update result for information if needed
+        if (updateResult.IsAcknowledged)
+        {
+            Console.WriteLine($"Updated {updateResult.ModifiedCount} documents.");
+        }
+    }
 
        private string GetArrayStringRepresentation(Array array)
         {
