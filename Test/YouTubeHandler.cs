@@ -12,7 +12,7 @@ internal class YouTubeHandler
     public async Task SearchAndUploadVideos()
         {
             
-            string searchQuery = "learn simulator racing"; // Replace with your search query
+            string searchQuery = "Simulator Racing Tips/Technique"; // Replace with your search query
             int maxResults = 100; // Replace with the maximum number of results you want
             string gmtDate = DateTimeHelper.GetCurrentGMTDate();
             string collectionName = "LastUpdatedVideo";
