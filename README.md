@@ -45,7 +45,7 @@ C# - Selected to align with F1 industry standard. As well as resource provided b
 
 - GT data unpacker and other utils - NENKAI @ ddm999 Daniel Lee, PDTools, 2023, https://github.com/Nenkai/PDTools
 
-## License
+## Licence
 
 Copyright (c) 2023 Max Byng-Maddick
 
